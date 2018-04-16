@@ -5,7 +5,8 @@
 Node与Express开发
 前端工程化：体系设计与实践
 
-图解HTTP  HTTP权威指南
+图解HTTP  
+HTTP权威指南
 javascript 权威指南
 javascript 设计模式
 javascript 高级程序设计
