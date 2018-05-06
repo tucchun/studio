@@ -201,3 +201,114 @@ data.set('format', 'ebook')
 // log(iterator.next())
 // log(iterator.next())
 
+// function *createNumberIterator () {
+//   yield 1;
+//   yield 2;
+//   return 3;
+// }
+
+// function *createRepeatingIterator (count) {
+//   for (let i = 0; i < count; i++) {
+//     yield 'repeat'
+//   }
+// }
+
+// function *createCombinedIterator () {
+//   let result = yield *createNumberIterator();
+//   yield result;
+//   log('result', result)
+//   yield *createRepeatingIterator(result)
+// }
+
+// let iterator = createCombinedIterator()
+
+// log(iterator.next());
+// log(iterator.next());
+// log(iterator.next());
+// log(iterator.next());
+// log(iterator.next());
+// log(iterator.next());
+// log(iterator.next());
+
+/**
+ * 
+ * @param {Function} taskDef 生成器函数
+ */
+function run (taskDef) {
+  // 创建一个无使用限制的迭代器
+  let task = taskDef()
+
+  // 开始执行任务
+  let result = task.next()
+
+  // 循环调用next() 函数
+  function step () {
+    
+    // 如果任务未完成，则继续执行
+    if (!result.done) {
+      result = task.next(result.value)
+      step()
+    }
+  }
+
+  // 开始迭代执行
+  step()
+}
+
+run(function *(){
+  let value = yield 1;
+  log(value)
+  value = yield value + 3;
+  log(value)
+})
+
+
+/**
+ * 
+ * @param {Function} taskDef 生成器函数
+ */
+function run (taskDef) {
+  // 创建一个无使用限制的迭代器
+  let task = taskDef()
+
+  // 开始执行任务
+  let result = task.next()
+
+  // 循环调用next() 函数
+  function step () {
+    
+    // 如果任务未完成，则继续执行
+    if (!result.done) {
+      if (typeof result.value === 'function') {
+        result.value(function (err, data) {
+          if (err) {
+            result = task.throw(err)
+          }
+          result = task.next(data)
+          step()
+        })
+      } else {
+        result = task.next(result.value)
+        step()
+      }
+    }
+  }
+
+  // 开始迭代执行
+  step()
+}
+
+function fetchData () {
+  return function (next) {
+    setTimeout(function () {
+      next(null, 'hi')
+    }, 50)
+  }
+}
+
+run(function *(){
+  let result = yield fetchData()
+  log(result)
+  result = yield result + 1
+  log(result)
+})
