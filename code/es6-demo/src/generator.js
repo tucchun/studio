@@ -230,85 +230,167 @@ data.set('format', 'ebook')
 // log(iterator.next());
 // log(iterator.next());
 
-/**
- * 
- * @param {Function} taskDef 生成器函数
- */
-function run (taskDef) {
-  // 创建一个无使用限制的迭代器
-  let task = taskDef()
+// /**
+//  * 
+//  * @param {Function} taskDef 生成器函数
+//  */
+// function run (taskDef) {
+//   // 创建一个无使用限制的迭代器
+//   let task = taskDef()
 
-  // 开始执行任务
-  let result = task.next()
+//   // 开始执行任务
+//   let result = task.next()
 
-  // 循环调用next() 函数
-  function step () {
+//   // 循环调用next() 函数
+//   function step () {
     
-    // 如果任务未完成，则继续执行
-    if (!result.done) {
-      result = task.next(result.value)
-      step()
-    }
-  }
+//     // 如果任务未完成，则继续执行
+//     if (!result.done) {
+//       result = task.next(result.value)
+//       step()
+//     }
+//   }
 
-  // 开始迭代执行
-  step()
+//   // 开始迭代执行
+//   step()
+// }
+
+// run(function *(){
+//   let value = yield 1;
+//   log(value)
+//   value = yield value + 3;
+//   log(value)
+// })
+
+
+// /**
+//  * 
+//  * @param {Function} taskDef 生成器函数
+//  */
+// function run (taskDef) {
+//   // 创建一个无使用限制的迭代器
+//   let task = taskDef()
+
+//   // 开始执行任务
+//   let result = task.next()
+
+//   // 循环调用next() 函数
+//   function step () {
+    
+//     // 如果任务未完成，则继续执行
+//     if (!result.done) {
+//       if (typeof result.value === 'function') {
+//         result.value(function (err, data) {
+//           if (err) {
+//             result = task.throw(err)
+//           }
+//           result = task.next(data)
+//           step()
+//         })
+//       } else {
+//         result = task.next(result.value)
+//         step()
+//       }
+//     }
+//   }
+
+//   // 开始迭代执行
+//   step()
+// }
+
+// function fetchData () {
+//   return function (next) {
+//     setTimeout(function () {
+//       next(null, 'hi')
+//     }, 50)
+//   }
+// }
+
+// run(function *(){
+//   let result = yield fetchData()
+//   log(result)
+//   result = yield result + 1
+//   log(result)
+// })
+
+// function fetchData () {
+//   return new Promise(function (resolve, reject) {
+//     setTimeout(function () {
+//       resolve('hi')
+//     }, 50)
+//   })
+// }
+
+// function run(taskDef){
+//   return new Promise(function (resolve, reject){
+//     // 生产迭代器
+//     let iterator = taskDef()
+
+//     // 开始执行任务
+//     let result = iterator.next()
+
+//     // 循环迭代
+//     function step() {
+
+//       if (!result.done) {
+//         if (result.value instanceof Promise) {
+//           result.value.then(function (data) {
+//             result = iterator.next(data)
+//             step()
+//           }).catch(function (err) {
+//             result = iterator.throw(new Error(err))
+//             step()
+//           })
+//         } else {
+//           result = iterator.next(result.value)
+//           step()
+//         }
+//       }
+
+//     }
+//     // 迭代
+//     step()
+//   })
+// }
+
+// function fetchData () {
+//   return function (next) {
+//     setTimeout(function () {
+//       next(null, 'hi')
+//     }, 50)
+//   }
+// }
+// run(function* () {
+//   let result = yield fetchData()
+//   log(result)
+//   result = yield result + 1
+//   log(result)
+// })
+
+function resolveAfter2Seconds (x) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(x)
+    }, 2000)
+  })
 }
 
-run(function *(){
-  let value = yield 1;
-  log(value)
-  value = yield value + 3;
-  log(value)
+async function add1(x) {
+  var a = await resolveAfter2Seconds(20)
+  var b = await resolveAfter2Seconds(30)
+  return x + a + b;
+}
+
+add1(10).then(v => {
+  console.log(v)
 })
 
-
-/**
- * 
- * @param {Function} taskDef 生成器函数
- */
-function run (taskDef) {
-  // 创建一个无使用限制的迭代器
-  let task = taskDef()
-
-  // 开始执行任务
-  let result = task.next()
-
-  // 循环调用next() 函数
-  function step () {
-    
-    // 如果任务未完成，则继续执行
-    if (!result.done) {
-      if (typeof result.value === 'function') {
-        result.value(function (err, data) {
-          if (err) {
-            result = task.throw(err)
-          }
-          result = task.next(data)
-          step()
-        })
-      } else {
-        result = task.next(result.value)
-        step()
-      }
-    }
-  }
-
-  // 开始迭代执行
-  step()
+async function add2(x) {
+  var a = resolveAfter2Seconds(20)
+  var b = resolveAfter2Seconds(30)
+  return x + await a + await b;
 }
 
-function fetchData () {
-  return function (next) {
-    setTimeout(function () {
-      next(null, 'hi')
-    }, 50)
-  }
-}
-
-run(function *(){
-  let result = yield fetchData()
-  log(result)
-  result = yield result + 1
-  log(result)
+add2(10).then(v => {
+  console.log(v)
 })

@@ -1,0 +1,11 @@
+node_modules/
+node_modules_bak/
+dist/
+npm-debug.log
+.DS_Store
+dist.zip
+*.tar.gz
+yarn.lock
+yarn-error.log
+automation/
+node_modules.zip
