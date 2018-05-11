@@ -1,0 +1,21 @@
+@import '../../assets/style/val';
+$height: 60px;
+.site-nav{
+  width: 100%;
+  height: $height;
+  background-color: #000;
+  color: #fff;
+}
+
+.inner{
+  width: $width;
+  margin: 0 auto;
+}
+
+.info > p,
+.user > p{
+  padding: 0;
+  margin: 0;
+  height: $height;
+  line-height: $height;
+}

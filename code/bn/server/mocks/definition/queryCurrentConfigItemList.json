@@ -1,0 +1,17 @@
+{
+  "responseCode": "000000",
+  "responseMsg": "成功",
+  "configItemList": [
+    {
+      "configByteSize": "10",
+      "configContent": "configContent",
+      "configGroup": "configGroup",
+      "configKey": "configKey",
+      "configMD5": "configMD5",
+      "createdBy": "createdBy",
+      "dateCreated": "dateCreated",
+      "dateUpdated": "dateUpdated",
+      "updatedBy": "updatedBy"
+    }
+  ]
+}

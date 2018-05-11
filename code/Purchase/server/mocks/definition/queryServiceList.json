@@ -1,0 +1,15 @@
+{
+  "responseCode": "000000",
+  "returnMsg": "成功",
+  "totalCount": 1,
+  "model": {
+    "serviceList": [
+      {
+        "boxName": "lili",
+        "gearName": "TestGear",
+        "serviceId": "TestJob",
+        "serviceName": "袁振"
+      }
+    ]
+  }
+}
