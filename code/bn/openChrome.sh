@@ -1,1 +1,1 @@
-open -n /Applications/Google\ Chrome.app/ --args --disable-web-security  --user-data-dir=/Users/tuchuanchun/Documents/MyChromeDevUserData/
+open -n /Applications/Google\ Chrome.app/ --args --disable-web-security  --user-data-dir=/Users/yourname/MyChromeDevUserData/

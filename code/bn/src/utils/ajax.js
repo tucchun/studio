@@ -17,7 +17,7 @@ if (!__RUN_IN_PRD__) {
 // FVT: API_ROOT = 'http://www.uat.jushenghua.com/ec'
 // UAT: API_ROOT = 'http://qhsj.uat.jushenghua.com/ec'
 if (location.host.match('localhost') || location.host.match('127.0.0.1')) {
-  API_ROOT = 'http://qhsj.uat.jushenghua.com/ec'
+  API_ROOT = 'http://www.fvt.jushenghua.com/ec'
 }
 
 let shths = (data) => md5(JSON.stringify(data))
@@ -33,10 +33,10 @@ axios.interceptors.request.use(config => {
     // _hide = message.loading('')
   }
 
-  if (!_flag) {
-    error('不要直接引用utils/ajax模块，请使用this.props.ajax')
-    throw new Error('不要直接引用utils/ajax模块，请使用this.props.ajax')
-  }
+  // if (!_flag) {
+  //   error('不要直接引用utils/ajax模块，请使用this.props.ajax')
+  //   throw new Error('不要直接引用utils/ajax模块，请使用this.props.ajax')
+  // }
   let url = config.url
   const fullUrl = (url.indexOf(API_ROOT) === -1) ? API_ROOT + url : url
   config.url = fullUrl
@@ -102,25 +102,48 @@ axios.interceptors.response.use(response => {
 
   return error.response
 })
-
+const settings = {
+  timeout: 10000,
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Accept': 'application/json'
+  },
+  responseType: 'json'
+}
 export default function (url, data = {}, config = {}, showLoading = true, flag) {
   // _isEncrpyt = isEncrpyt
   _flag = flag
   _showLoading = showLoading
   // _isCustomHandleError = isCustomHandleError
-  let opts = {
-    timeout: 10000,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Accept': 'application/json'
-    },
-    responseType: 'json',
-    data,
-    url,
-    ...config
+  let args = {}
+  const argsNumber = arguments.length
+  switch (argsNumber) {
+    case 1:
+      args = {
+        ...settings,
+        ...arguments[0]
+      }
+      break
+    case 2:
+      args = {
+        ...settings,
+        url: arguments[0],
+        data: arguments[1]
+      }
+      break
+    case 3:
+      args = {
+        url: arguments[0],
+        data: arguments[1],
+        ...{
+          ...settings,
+          ...arguments[2]
+        }
+      }
+      break
   }
-  return axios(opts)
+  return axios(args)
 }
 
 export const API_ROOT1 = API_ROOT

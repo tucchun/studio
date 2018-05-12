@@ -83,7 +83,7 @@ webpackConfig.plugins = [
 
 webpackConfig.externals = {
   // '$': '$',
-  // 'CryptoJS': 'CryptoJS',
+  'CryptoJS': 'CryptoJS',
   // 'weui': 'weui'
 }
 

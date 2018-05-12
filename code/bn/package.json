@@ -76,11 +76,11 @@
   },
   "homepage": "http://www.openlo.cn:8083/front-end/react-redux-kit#readme",
   "dependencies": {
+    "antd": "^3.5.1",
     "axios": "^0.18.0",
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
     "babel-loader": "^7.1.2",
-    "babel-plugin-import": "^1.0.0",
     "babel-plugin-transform-react-constant-elements": "^6.9.1",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-plugin-transform-react-remove-prop-types": "^0.2.7",
@@ -111,6 +111,7 @@
     "mescroll.js": "^1.2.3",
     "moment": "^2.19.1",
     "node-forge": "^0.7.5",
+    "node-rsa": "^0.4.2",
     "node-sass": "^4.9.0",
     "normalize.css": "^8.0.0",
     "nuka-carousel": "^3.0.0",
@@ -131,6 +132,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.2.2",
+    "babel-plugin-import": "^1.7.0",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "eslint": "^4.6.1",
     "eslint-config-standard": "^10.2.1",
