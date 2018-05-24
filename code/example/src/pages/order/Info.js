@@ -5,8 +5,9 @@ import { Process, Describe } from '../../components/ordersItem'
 import { GoodsTable } from '../../components/goodsItem'
 import { withTemplate } from '../template'
 import ajax from '../../utils/ajax'
+import { connect } from 'react-redux'
 
-export default class OrderInfo extends React.Component {
+export class OrderInfo extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -75,5 +76,13 @@ export default class OrderInfo extends React.Component {
     )
   }
 }
+const mapStateToProps = state => {
+  return {
+    header: state.collects
+  }
+}
+export default connect(
+  mapStateToProps
+)(OrderInfo)
 
 // export default withTemplate(OrderInfo)

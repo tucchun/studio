@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import Breadcrumb from '../../components/breadcrumb'
 import { Input, Button } from '../../components/form'
 import { OrdersItem, OrderPrd } from '../../components/ordersItem'
 import style from './style.scss'
-
-import { withTemplate } from '../template'
+import { setCollect } from '../../actions'
 import ajax from '../../utils/ajax'
 import 'react-datetime/css/react-datetime.css'
 import DateTime from 'react-datetime'
@@ -48,10 +48,10 @@ export class OrderList extends React.Component {
   }
 
   doSearch () {
-    this.props.toggleHeaderNumber({
+    this.props.dispatch(setCollect({
       cartNums: 20,
       collectNums: 20
-    })
+    }))
   }
 
   doClickOrderInfo (orderId) {
@@ -106,6 +106,8 @@ export class OrderList extends React.Component {
   }
 
   render () {
+    debugger
+    console.log(this.props.header)
     console.log(this.state.lstData.girdData)
     return (
       <React.Fragment>
@@ -203,7 +205,17 @@ export class OrderList extends React.Component {
 OrderList.propTypes = {
   history: PropTypes.any,
   context: PropTypes.any,
-  toggleHeaderNumber: PropTypes.func
+  toggleHeaderNumber: PropTypes.func,
+  dispatch: PropTypes.func
 }
 
-export default withTemplate(OrderList)
+const mapStateToProps = state => {
+  return {
+    header: state.collects
+  }
+}
+export default connect(
+  mapStateToProps
+)(OrderList)
+// export default connect()(OrderList)
+

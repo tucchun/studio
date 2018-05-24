@@ -1,39 +1,45 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import SiteNav from '../../components/siteNav'
 import ClassifyNav from '../../components/classifyNav/ClassifyNav'
 import Header from '../../components/header'
 import Footer from '../../components/footer'
-import { RouteWithSubRoutes } from '../../router'
-import { withRouter } from 'react-router'
+import { RouteWithSubRoutes , asyncComponent} from '../../router'
+import { Route, Switch } from 'react-router-dom'
+import AsyncRoute from '../../components/route'
+import List from '../../pages/order/List'
+import Loadable from 'react-loadable'
 export class WrapperTempate extends React.Component {
   constructor (props) {
     super(props)
-    this.toggleHeaderNumber = this.toggleHeaderNumber.bind(this)
+    console.log(props)
     this.state = {
-      header: {
-        headerNums: {
-          cartNums: 10,
-          collectNums: 10
-        }
-      }
+      com: undefined
     }
   }
 
   static propTypes = {
-    routes: PropTypes.any
+    routes: PropTypes.any,
+    headerNums: PropTypes.object
   }
 
-  toggleHeaderNumber (result) {
-    this.setState({
-      ...this.state,
-      header: {
-        ...this.state.header,
-        headerNums: {
-          ...this.state.header.headerNums,
-          ...result
-        }
-      }
+  componentWillMount (nextProps) {
+    this.routes = (this.props.routes || []).map((route, i) => <RouteWithSubRoutes
+      key={new Date().getTime()}
+      {...route}
+    />)
+  }
+
+  componentDidMount () {
+    let com = Loadable({
+      loader: () => import('../../pages/order/List'),
+      loading: () => (<div>11</div>)
+    })
+    Loadable.preloadAll().then(() => {
+      this.setState({
+        com
+      })
     })
   }
 
@@ -41,18 +47,28 @@ export class WrapperTempate extends React.Component {
     return (
       <React.Fragment>
         <SiteNav />
-        <Header HeaderNums={this.state.header.headerNums} />
+        <Header HeaderNums={this.props.headerNums} />
         <ClassifyNav />
-        {(this.props.routes || []).map((route, i) => <RouteWithSubRoutes
-          key={i}
-          {...route}
-          context={this.state}
-          toggleHeaderNumber={this.toggleHeaderNumber}
-        />)}
+        {/* {this.state.com ? (<Route path='/pages/orders' component={this.state.com} />) : null} */}
+        {/* <Route path='/pages/orders' component={List} /> */}
+        <Switch>
+          {/* <Route path='/pages/orders' component={asyncComponent(() => import('../../pages/order/List'))} />
+          <Route path='/pages/ordersinfo' component={asyncComponent(() => import('../../pages/order/Info'))} /> */}
+          {(this.props.routes || []).map((route, i) => <RouteWithSubRoutes key={i} {...route} />)}
+        </Switch>
         <Footer />
       </React.Fragment>
     )
   }
 }
 
-export default withRouter(WrapperTempate)
+const mapStateToProps = state => {
+  return {
+    header: state.collects
+  }
+}
+export default connect(
+  mapStateToProps
+)(WrapperTempate)
+
+// export default withRouter(WrapperTempate)

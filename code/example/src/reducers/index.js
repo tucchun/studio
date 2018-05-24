@@ -1,9 +1,10 @@
-import { combineReducers } from 'redux'
+// import { combineReducers } from 'redux'
 import {
   ADD_TODO,
   TOGGLE_TODO,
   SET_VISIBILITY_FILTER,
-  VisibilityFilters
+  VisibilityFilters,
+  UPDATECOLLECT
 } from '../actions'
 const { SHOW_ALL } = VisibilityFilters
 
@@ -15,6 +16,7 @@ function visibilityFilter(state = SHOW_ALL, action) {
       return state
   }
 }
+
 
 function todos(state = [], action) {
   switch (action.type) {
@@ -40,7 +42,29 @@ function todos(state = [], action) {
   }
 }
 
+function collects (state = {
+  headerNums: {
+    cartNums: 10,
+    collectNums: 10
+  }
+}, action) {
+  switch (action.type) {
+    case UPDATECOLLECT:
+      return {
+        ...state,
+        headerNums: {
+          ...state.headerNums,
+          cartNums: action.count.cartNums,
+          collectNums: action.count.collectNums
+        }
+      }
+    default:
+      return state
+  }
+}
+
 export default {
   visibilityFilter,
-  todos
+  todos,
+  collects
 }

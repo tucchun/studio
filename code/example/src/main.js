@@ -9,7 +9,7 @@ import { HashRouter as Router, Switch } from 'react-router-dom'
 import 'normalize.css'
 import './assets/style/common.css'
 
-import routes, { RouteWithSubRoutes } from './router'
+import routes, { RouteWithSubRoutes, Wrapper } from './router'
 
 const history = createHashHistory()
 
