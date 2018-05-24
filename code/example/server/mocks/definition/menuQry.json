@@ -1,0 +1,80 @@
+{
+  "model": {"menuList": [
+    {
+      "menuId": "taprdmng",
+      "menuName": "产品管理(TA)",
+      "menuType": "0",
+      "orderValue": 0,
+      "url": "/dashboard/taprdmng",
+      "childMenuList": [
+        {
+          "menuId": "basicArgMng",
+          "menuName": "基础参数管理",
+          "menuType": "1",
+          "orderValue": 0,
+          "parentMenuId": "taprdmng",
+          "childMenuList": [
+            {
+              "menuId": "taInfoConf",
+              "menuName": "TA信息设置",
+              "menuType": "2",
+              "orderValue": 0,
+              "parentMenuId": "basicArgMng",
+              "url": "/dashboard/taprdmng/taInfoConf"
+            },
+            {
+              "menuId": "prdCodeConf",
+              "menuName": "产品代码设置",
+              "menuType": "2",
+              "orderValue": 0,
+              "parentMenuId": "basicArgMng",
+              "url": "/dashboard/taprdmng/prdCodeConf"
+            },
+            {
+              "menuId": "prdInfoConf",
+              "menuName": "产品信息设置",
+              "menuType": "2",
+              "orderValue": 0,
+              "parentMenuId": "basicArgMng",
+              "url": "/dashboard/taprdmng/prdInfoConf"
+            }
+          ]
+        },
+        {
+          "menuId": "salesArgMng",
+          "menuName": "销售参数管理",
+          "menuType": "1",
+          "orderValue": 0,
+          "parentMenuId": "taprdmng",
+          "childMenuList": [
+            {
+              "menuId": "transStatusConf",
+              "menuName": "交易状态设置",
+              "menuType": "2",
+              "orderValue": 0,
+              "parentMenuId": "salesArgMng",
+              "url": "/dashboard/taprdmng/transStatusConf"
+            },
+            {
+              "menuId": "prdeduConf",
+              "menuName": "产品额度控制",
+              "menuType": "2",
+              "orderValue": 0,
+              "parentMenuId": "salesArgMng",
+              "url": "/dashboard/taprdmng/prdeduConf"
+            },
+            {
+              "menuId": "prdhushuConf",
+              "menuName": "产品户数控制",
+              "menuType": "2",
+              "orderValue": 0,
+              "parentMenuId": "salesArgMng",
+              "url": "/dashboard/taprdmng/prdhushuConf"
+            }
+          ]
+        }
+      ]
+    }]},
+    "responseCode": "000000",
+    "responseMsg": "成功"
+}

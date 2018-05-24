@@ -1,0 +1,84 @@
+@import '../../assets/style/val';
+.wrapper{
+  width: $width;
+  margin: 0 auto;
+  text-align: center;
+  .process,
+  .item{
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .process{
+    width: 74px;
+    height: 4px;
+    background-image: url('./images/process-icon.png');
+    background-position: center;
+  }
+  .item {
+    padding: 20px 35px;
+    width: 64px;
+    height: 130px;
+  }
+  .process-time,
+  .process-text{
+    color: $font-secondary-color;
+  }
+  .process-text{
+    margin-top: 7px;
+    font-size: 16px;
+  }
+  .process-time{
+    margin-top: 13px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 16px;
+  }
+  .process-verify,
+  .process-done,
+  .process-edit{
+    width: 100%;
+    height: 60px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .process-edit{
+    background-image: url('./images/process-edit.png');
+  }
+  .process-verify{
+    background-image: url('./images/admin-verify.png');
+  }
+  .process-done{
+    background-image: url('./images/process-done.png');
+  }
+  &.process-edit-active .process-edit,
+  &.process-verify-active .process-edit,
+  &.process-done-active .process-edit  {
+    background-image: url('./images/process-edit-active.png')
+  }
+  &.process-edit-active .process-text.edit,
+  &.process-verify-active .process-text.edit,
+  &.process-done-active .process-text.edit  {
+    color: $font-primary-color;
+  }
+  &.process-verify-active .process-verify,
+  &.process-done-active .process-verify {
+    background-image: url('./images/process-done-active.png')
+  }
+  &.process-verify-active .process-text.verify,
+  &.process-done-active .process-text.verify {
+    color: $font-primary-color;
+  }
+  &.process-verify-active .process.verify,
+  &.process-done-active .process.verify{
+    background-image: url('./images/process-icon-acitve.png')
+  }
+  &.process-done-active .process-done {
+    background-image: url('./images/process-done-active.png')
+  }
+  &.process-done-active .process-text.done {
+    color: $font-primary-color;
+  }
+  &.process-done-active .process.done {
+    background-image: url('./images/process-icon-acitve.png')
+  }
+}

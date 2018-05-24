@@ -1,0 +1,32 @@
+@import '../../assets/style/val';
+$height: 40px;
+.site-nav{
+  width: 100%;
+  height: $height;
+  background-color: $primary-color;
+  color: rgba(255, 255, 255, .56);
+  font-size: 14px;
+}
+.inner{
+  width: $width;
+  margin: 0 auto;
+}
+
+.info > p{
+  padding: 0;
+  margin: 0;
+  height: $height;
+  line-height: $height;
+}
+.user > span {
+  margin-right: 2px;
+}
+.w40 i[role=button-value]{
+  font-size: 14px!important;
+ }
+ 
+.w40{
+  height: 40px;
+  padding: 0 12px;
+  color: rgba(221, 221, 221, 0.56);
+ }

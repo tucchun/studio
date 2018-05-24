@@ -1,0 +1,22 @@
+@import '../../../assets/style/val';
+@import '../../../assets/style/common';
+.editorCount{
+  width:136px;
+  .button{
+    width:35px;
+    height:32px;
+    border:1px solid $dividing-line-color;
+    padding:0;
+    vertical-align: top;
+  }
+  .button.add{
+    border-left:none;
+  }
+  .button.minus{
+    border-right:none;
+  }
+  .count{
+    width:64px;
+    text-align:center;
+  }
+}

@@ -1,0 +1,107 @@
+@import "../../../assets/style/val";
+// @import '../../../assets/style/common';
+@import '../../../assets/icon/icon';
+.goodsItem{
+  float:left;
+  width:200px;
+  padding:20px 14px 16px;
+  margin:5px 5px 10px 5px;
+  background:$white-color;
+  .goodsImg{
+    vertical-align: top;
+    width:100%;
+    margin-bottom: 20px;
+  }
+  a{
+    color:$font-primary-color;
+    text-decoration: none;
+    &:hover{
+      color:$secondary-color;
+      .icon-collection{
+        background:url('../../../assets/icon/images/star_collect.png') no-repeat 0 0 transparent;
+      }
+    }
+  }
+  a.collected{
+    color:$font-primary-color;
+    .icon-collection{
+      background:url('../../../assets/icon/images/icon_collectioned.png') no-repeat 0 0 transparent;
+    }
+    &:hover{
+      color:$secondary-color;
+      .icon-collection{
+        background:url('../../../assets/icon/images/star_collected.png') no-repeat 0 0 transparent;
+      }
+    }
+  }
+  .price{
+    color:$secondary-color;
+    font-size:20px;
+    margin-bottom:15px;
+    font-family:MicrosoftYaHei-Bold;
+  }
+  .introduce{
+    color:$font-primary-color;
+    font-size:14px;
+    margin-bottom:20px;
+  }
+  &:hover{
+    box-shadow:0 0 5px 5px #dddddd;
+    .introduce{
+      color:$secondary-color;
+    }
+  }
+}
+.item{
+  .price{
+    font-family:MicrosoftYaHei-Bold;
+    margin-bottom:0;
+  }
+}
+.list{
+  margin-bottom:20px;
+}
+.shop-cart-item{
+  width:100%;
+  border-bottom:1px dashed $dividing-line-color;
+  padding:20px 0;
+  color:$font-secondary-color;
+  &:last-child{
+    border:none;
+  }
+  .divimg{
+    margin-right:28px;
+  }
+  img{
+    width:100px;
+    height:100px;
+    border:1px solid $dividing-line-color;
+    vertical-align: top;
+  }
+  p{
+    margin:1rem 0;
+  }
+  .introduce{
+    width:278px;
+    p{
+      width:220px;
+    }
+    p:first-child{
+      color:$font-secondary-color;
+    }
+    p:last-child{
+      color:$font-third-color;
+    }
+  }
+  .w231{
+    width:231px;
+    text-align:center;
+    .price {
+      color: $secondary-color;
+    }
+  }
+  .subtotal{
+    text-align:right;
+    font-size:16px;
+  }
+}

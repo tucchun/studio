@@ -1,0 +1,30 @@
+@import '../../assets/style/val';
+$height: 130px;
+.header{
+  width: 100%;
+  background: #fff;
+  .content{
+    width: $width;
+    margin: 0 auto;
+    height: $height;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    .logo{
+      width: 370px;
+      height: 72px;
+    }
+    .operate{
+      display: flex;
+      align-items: center;
+    }
+    .btncart{
+      margin: 0 6px 0 30px;
+    }
+    .w40{
+      height: 40px;
+    }
+  }
+}
+

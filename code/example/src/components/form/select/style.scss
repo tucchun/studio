@@ -1,0 +1,61 @@
+@import '../../../assets/style/val';
+.select-wrapper{
+  display: inline-block;
+  cursor: pointer;
+}
+
+.select-inner{
+  position: relative;
+  display: inline-block;
+  padding: 0 10px;
+  border: solid 1px $bg-color;
+  width: 160px;
+  font-size: 14px;
+  color: $font-primary-color;
+  z-index: auto;
+}
+
+.select-value{
+  display: block;
+  height: 32px;
+  line-height: 32px;
+  overflow: hidden;
+  margin-right: 10px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.icon{
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  margin-top: -2px;
+  display: inline-block;
+  width: 10px;
+  height: 4px;
+  background-image: url('./images/icon-select.png');
+  background-position: center;
+}
+
+.select-list{
+  position: absolute;
+  left: -1px;
+  width: 100%;
+  margin: 5px 0 0 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid $bg-color;
+  border-radius: 5px;
+  background-color: $white-color;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.select-list > li{
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.select-list > li:hover{
+  background-color: $bg-color;
+}

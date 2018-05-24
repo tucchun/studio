@@ -1,0 +1,36 @@
+@import '../../../assets/style/val';
+.wrapper{
+  cursor: pointer;
+}
+.label{
+  margin-left: 10px;
+}
+
+.label,
+.checkbox{
+  vertical-align: middle;
+}
+
+.checkbox{
+  display: inline-block;
+  position: relative;
+  width: 18px;
+  height: 18px;
+  background-color: $white-color;
+  border: 1px solid $bg-color;
+  text-align: center;
+  // z-index: -1;
+}
+.checked{
+  display: inline-block;
+  width: 12px;
+  height: 8px;
+  background-image: url('./images/checkbox.png');
+  background-position: center;
+  // vertical-align: middle;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -4px;
+  margin-left: -6px;
+}

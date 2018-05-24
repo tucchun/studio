@@ -1,0 +1,43 @@
+@import '../../assets/style/val.scss';
+// @import '../../assets/style/common.scss';
+.collect{
+  padding-bottom: 280px;
+  .header{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    background: #fff;
+    p{
+      height: 100px;
+      width: $width;
+      display: flex;
+      margin: 0 auto;
+      align-items: center;
+      font-size: 24px;
+      font-weight: normal;
+      font-stretch: normal;
+      line-height: 48px;
+      letter-spacing: 0px;
+      color: #333333; 
+      i{
+        display: inline-block;
+        background-image: url(../../assets/icon/images/icon_my_collection.png);
+        background-repeat: no-repeat;
+        background-size: cover;
+        width: 24px;
+        height: 21px;
+        margin: 0 22px 0 37px;
+      }
+    }
+  }
+  .collect-container{
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    background: #fff;
+    .collect-content{
+      width: $width;
+      margin: 0 auto 140px auto;
+    }
+  }
+}

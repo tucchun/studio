@@ -1,0 +1,15 @@
+body,html{font-size:14px;font-family: MicrosoftYaHei;}
+li{list-style:none;}
+.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+.pull-left{
+  float: left
+}
+.pull-right{
+  float: right
+}
+.show {
+  display: block !important;
+}
+.hidden {
+  display: none !important;
+}

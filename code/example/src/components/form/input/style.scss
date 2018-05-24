@@ -1,0 +1,11 @@
+@import '../../../assets/style/val';
+.input{
+  border: solid 1px $bg-color;
+  height: 30px;
+  line-height: 30px;
+  font-size: 14px;
+  width: 120px;
+  color: $font-primary-color;
+  outline: none;
+  padding: 0;
+}

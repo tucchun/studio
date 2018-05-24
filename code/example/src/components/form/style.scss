@@ -1,0 +1,37 @@
+.cnt > *{
+  display: inline-block;
+  margin: 10px;
+}
+.login{
+  width: 260px;
+  padding: 0;
+}
+
+.add-cart{
+  width: 260px;
+  padding: 0;
+  height: 50px;
+  font-weight: bold;
+}
+
+.add-collect > i:nth-child(2){
+  font-size: 14px;
+}
+
+.w160{
+  width: 160px;
+  padding: 0;
+}
+
+.w40 i[role=button-value]{
+ font-size: 14px!important;
+}
+
+.w40{
+  height: 40px;
+  padding: 0 12px;
+}
+
+.m20 {
+  margin: 20px;
+}
