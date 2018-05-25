@@ -17,6 +17,7 @@ export const VisibilityFilters = {
   SHOW_ACTIVE: 'SHOW_ACTIVE'
 }
 
+export const fetch = Symbol('fetch')
 /*
  * action creators
  */
@@ -39,3 +40,4 @@ export function setCollect(count) {
     count
   }
 }
+

@@ -1,7 +1,7 @@
 import forge from 'node-forge'
 import rsaEncrypt from 'utils/rsa'
 import CryptoJS from 'CryptoJS'
-import NodeRSA from 'node-rsa'
+// import NodeRSA from 'node-rsa'
 
 export function md5 (data) {
   data = data || ''

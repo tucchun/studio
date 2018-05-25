@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Carousel } from 'antd'
+// import { Carousel } from 'antd'
 import './style.css'
 export default class Index extends Component {
 
@@ -15,12 +15,7 @@ export default class Index extends Component {
   render (props) {
     return (
       <div>
-        <Carousel afterChange={this.onChange}>
-          <div><h3>1</h3></div>
-          <div><h3>2</h3></div>
-          <div><h3>3</h3></div>
-          <div><h3>4</h3></div>
-        </Carousel>
+        1
       </div>
     )
   }

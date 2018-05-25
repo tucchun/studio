@@ -40,6 +40,14 @@ exports.cssLoaders = function (options) {
           sourceMap: options.sourceMap
         })
       })
+      if (loader === 'sass') {
+        loaders.push({
+          loader: 'sass-resources-loader',
+          options: {
+            resources: path.resolve(__dirname, '../src/assets/val.scss')
+          },
+        })
+      }
     }
 
     // Extract CSS when that option is specified

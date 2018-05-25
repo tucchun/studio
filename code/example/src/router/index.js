@@ -1,17 +1,17 @@
-import React from 'react'
-import { Route } from 'react-router-dom'
-import { withRouter } from 'react-router'
+import React from "react";
+import { Route, Switch } from "react-router-dom";
+import { withRouter } from "react-router";
 // import AsyncComponent from '../components/asyncComponent'
+import Loadable from "react-loadable";
+import { Loading } from "../components/loading";
 
-export function asyncComponent (importComponent) {
-
+export function asyncComponent(importComponent) {
   class AsyncComponent extends React.Component {
-
     constructor(props) {
       super(props);
 
       this.state = {
-        component: null,
+        component: null
       };
     }
 
@@ -26,11 +26,8 @@ export function asyncComponent (importComponent) {
     render() {
       const C = this.state.component;
 
-      return C
-        ? <C {...this.props} />
-        : null;
+      return C ? <C {...this.props} /> : null;
     }
-
   }
 
   return AsyncComponent;
@@ -38,25 +35,25 @@ export function asyncComponent (importComponent) {
 
 const routes = [
   {
-    path: '/',
+    path: "/",
     exact: true,
-    component: () => import('../pages/home')
+    component: () => import("../pages/home")
   },
   {
-    path: '/login',
-    component: () => import('../pages/login')
+    path: "/login",
+    component: () => import("../pages/login")
   },
   {
-    path: '/pages',
-    component: () => import('../pages/template/PagesTemplate'),
+    path: "/pages",
+    component: () => import("../pages/template/PagesTemplate"),
     routes: [
       {
-        path: '/pages/orders',
-        component: () => import('../pages/order/List')
+        path: "/pages/orders",
+        component: () => import("../pages/order/List")
       },
       {
-        path: '/pages/ordersinfo/:orderId',
-        component: () => import('../pages/order/Info')
+        path: "/pages/ordersinfo/:orderId",
+        component: () => import("../pages/order/Info")
       }
     ]
   }
@@ -95,7 +92,7 @@ const routes = [
   // {
   //   component: () => import('../pages/noMatch')
   // }
-]
+];
 
 // const RouteWithSubRoutes = route => {
 //   const Component = AsyncComponent(route.component)
@@ -130,60 +127,130 @@ const routes = [
 //     />
 //   )
 // }
-class RouteWithSubRoutes extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      RouteComponent: undefined
+
+// class RouteWithSubRoutes extends React.Component {
+//   constructor (props) {
+//     super(props)
+//     this.state = {
+//       RouteComponent: undefined
+//     }
+//   }
+//   componentDidMount () {
+//     debugger
+//     this.first = true
+//     this.props.component().then(RouteComponent => {
+//       this.setState({ RouteComponent: withRouter(RouteComponent.default) })
+//     })
+//   }
+
+//   componentDidUpdate (){
+//     this.first = false
+//     debugger
+//   }
+
+//   componentWillMount (){
+//     debugger
+//   }
+
+//   componentWillReceiveProps (){
+//     debugger
+//   }
+
+//   // shouldComponentUpdate(nextProps, nextState){
+//   //   debugger
+//   //   if(this.props.location.pathname === nextProps.location.pathname && !this.first) {
+//   //     return false
+//   //   }
+//   //   return true
+//   // }
+
+//   componentWillUpdate(){
+//     debugger
+//   }
+
+//   render () {
+//     debugger
+//     const RouteComponent = this.state.RouteComponent
+//     return (
+//       <div>
+//         {RouteComponent ? (
+//           <RouteComponent routes={this.props.routes} />
+//         ) : null}
+//       </div>
+//     )
+//   }
+// }
+
+function Wrapper(Component, routes) {
+  let arr = [];
+  routes.forEach((item, i) => {
+    arr.push({
+      C: Loadable({
+        loader: item.component,
+        path: item.path
+      })
+    });
+  });
+  return class Wrapper extends React.Component {
+    render() {
+      return <Component childComponent={arr} {...this.props} />;
     }
-  }
-  componentDidMount () {
-    debugger
-    this.first = true
-    this.props.component().then(RouteComponent => {
-      this.setState({ RouteComponent: withRouter(RouteComponent.default) })
-    })
-  }
-
-  componentDidUpdate (){
-    this.first = false
-    debugger
-  }
-
-  componentWillMount (){
-    debugger
-  }
-
-  componentWillReceiveProps (){
-    debugger
-  }
-
-  // shouldComponentUpdate(nextProps, nextState){
-  //   debugger
-  //   if(this.props.location.pathname === nextProps.location.pathname && !this.first) {
-  //     return false
-  //   }
-  //   return true
-  // }
-
-  componentWillUpdate(){
-    debugger
-  }
-
-  render () {
-    debugger
-    const RouteComponent = this.state.RouteComponent
-    return (
-      <div>
-        {RouteComponent ? (
-          <RouteComponent routes={this.props.routes} />
-        ) : null}
-      </div>
-    )
-  }
+  };
 }
 
-export default routes
-export {
-  RouteWithSubRoutes
+
+
+const RouteWithSubRoutes = route => {
+  let C = Loadable({
+    loader: route.component,
+    loading: Loading
+  })
+  return (
+    <Route
+      path={route.path}
+      render={props => (
+        // pass the sub-routes down to keep nesting
+        <C {...props} routes={route.routes} />
+      )}
+    />
+  )
 }
+
+function convert (routes) {
+  let arr = [];
+  routes.forEach((route, i) => {
+    arr.push({
+      ...route,
+      component: Loadable({
+        loader: route.component,
+        loading: Loading
+      })
+    });
+  });
+  return arr;
+}
+debugger
+function fn (routes) {
+  let temp = []
+  routes.forEach((route, i) => {
+    let __route__ = {
+      ...route,
+      component: Loadable({
+        loader: route.component,
+        loading: Loading
+      })
+    }
+    if (__route__.routes) {
+      let __routes__ = fn(__route__.routes)
+      __route__.routes = __routes__
+    }
+    temp.push(__route__)
+  })
+  return temp
+}
+
+let cn = fn(routes)
+console.log(cn)
+
+export default fn(routes);
+export { RouteWithSubRoutes, Wrapper, convert }
