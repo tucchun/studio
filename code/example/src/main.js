@@ -36,7 +36,7 @@ ReactDOM.render(
     <ConnectedRouter history={history}>
       <Router>
         <Switch>
-          {routes.map((route, i) => {
+          {/* {routes.map((route, i) => {
             return (
               <Route
                 exact={route.exact}
@@ -48,8 +48,8 @@ ReactDOM.render(
                 }}
               />
             );
-          })}
-          {/* {routes.map((route, i) => <RouteWithSubRoutes key={i} {...route} />)} */}
+          })} */}
+          {routes.map((route, i) => <RouteWithSubRoutes key={i} {...route} />)}
         </Switch>
       </Router>
     </ConnectedRouter>

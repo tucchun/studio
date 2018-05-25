@@ -53,8 +53,8 @@ export class WrapperTempate extends React.Component {
         <Switch>
           {/* <Route path='/pages/orders' component={asyncComponent(() => import('../../pages/order/List'))} />
           <Route path='/pages/ordersinfo' component={asyncComponent(() => import('../../pages/order/Info'))} /> */}
-          {/* {(this.props.routes || []).map((route, i) => <RouteWithSubRoutes key={i} {...route} />)} */}
-          {this.props.routes.map((route, i) => {
+          {(this.props.routes || []).map((route, i) => <RouteWithSubRoutes key={i} {...route} />)}
+          {/* {this.props.routes.map((route, i) => {
             return (
               <Route
                 path={route.path}
@@ -65,7 +65,7 @@ export class WrapperTempate extends React.Component {
                 }}
               />
             );
-          })}
+          })} */}
         </Switch>
         <Footer />
       </React.Fragment>

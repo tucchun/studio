@@ -200,21 +200,15 @@ function Wrapper(Component, routes) {
 
 
 
-const RouteWithSubRoutes = route => {
-  let C = Loadable({
-    loader: route.component,
-    loading: Loading
-  })
-  return (
-    <Route
-      path={route.path}
-      render={props => (
-        // pass the sub-routes down to keep nesting
-        <C {...props} routes={route.routes} />
-      )}
-    />
-  )
-}
+const RouteWithSubRoutes = route => (
+  <Route
+    path={route.path}
+    render={props => (
+      // pass the sub-routes down to keep nesting
+      <route.component {...props} routes={route.routes} />
+    )}
+  />
+);
 
 function convert (routes) {
   let arr = [];
