@@ -1,9 +1,5 @@
 import { md5 } from './security'
-// import { logger, error } from './logger'
-// import { hashHistory } from 'react-router'
 import axios from 'axios'
-// import initialStore from '../store'
-// import message from 'components/Toast'
 let _showLoading = true
 let API_ROOT = `${location.protocol}//${location.host}`
 if (!__RUN_IN_PRD__) {
@@ -72,8 +68,11 @@ axios.interceptors.response.use(response => {
       } else {
         if (data.responseCode === 'user.invalid') {
           // location.reload()
-          // setTimeout(() => { hashHistory.replace('/login') }, 1000)
-          return
+          // setTimeout(() => { HashRouter.replace('/login') }, 1000)
+          import('history/createHashHistory').then(createhashHistory => {
+            createhashHistory.default().replace('/login')
+          })
+          reject(data.responseCode)
         }
         reject(data)
       }
