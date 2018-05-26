@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 /**
  * @class Pagination
  * curentPage:
- * total:
+ * totalCount:
  * handleClick:
  */
 class Pagination extends Component {
@@ -14,9 +14,9 @@ class Pagination extends Component {
     let pageSize = props.pageSize || 40
     this.state = {
       currentPage: props.currentPage,
-      total: props.total,
+      totalCount: Number(props.totalCount),
       handleClick: props.handleClick,
-      totalPage: (props.total % pageSize) ? parseInt(props.total / pageSize) + 1 : props.total / pageSize
+      totalPage: (props.totalCount % pageSize) ? parseInt(props.totalCount / pageSize) + 1 : props.totalCount / pageSize
     }
     this.doPrevClick = this.doPrevClick.bind(this)
     this.doNumClick = this.doNumClick.bind(this)
@@ -24,7 +24,7 @@ class Pagination extends Component {
   }
   static propTypes = {
     currentPage: PropTypes.number,
-    total: PropTypes.number.isRequired,
+    totalCount: PropTypes.string.isRequired,
     handleClick: PropTypes.func,
     pageSize: PropTypes.number
   }
@@ -32,15 +32,17 @@ class Pagination extends Component {
     currentPage: 1
   }
   doPrevClick (e) {
+    console.log('in doPrev')
     if (this.state.currentPage > 1) {
       this.setState({ currentPage : this.state.currentPage - 1 })
-      this.state.handleClick(e)
+      this.state.handleClick(e, this.state.currentPage - 1)
     }
   }
   doNextClick (e) {
+    console.log('in doNext')
     if (this.state.currentPage < this.state.totalPage) {
       this.setState({ currentPage : this.state.currentPage + 1 })
-      this.state.handleClick(e)
+      this.state.handleClick(e, this.state.currentPage + 1)
     }
   }
   doNumClick (e) {

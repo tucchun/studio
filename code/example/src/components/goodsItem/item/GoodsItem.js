@@ -16,15 +16,15 @@ export default class Index extends Component {
     this.getCollection = this.getCollection.bind(this)
   }
 
-  getCollection (hasCollection) {
+  getCollection (favorite) {
     let alink = ''
-    if (parseInt(hasCollection)) {
+    if (parseInt(favorite)) {
       alink =
         <a className={style.collected} href='javascript:void(0)' onClick={
           (e) => {
             e.preventDefault()
             e.stopPropagation()
-            this.props.collection(e)
+            this.props.collection && this.props.collection(e)
           }
         }>
           <span className={multStyle(style.icon, style['icon-collection'])}>&nbsp;</span>
@@ -36,7 +36,7 @@ export default class Index extends Component {
           (e) => {
             e.preventDefault()
             e.stopPropagation()
-            this.props.collection(e)
+            this.props.collection && this.props.collection(e)
           }
         }>
           <span className={multStyle(style.icon, style['icon-collection'])}>&nbsp;</span>
@@ -50,17 +50,17 @@ export default class Index extends Component {
     return (
       <div className={style.goodsItem} onClick={
         (e) => {
-          this.props.onClick()
+          this.props.onClick && this.props.onClick()
         }
       }>
-        <UIImage size={'100'} src={this.state.goodsItem.productImageUrl || ''} className={style.goodsImg}/>
-        <div className={style.price}>￥<Text type={'price'}>{this.state.goodsItem.productPrice}</Text></div>
+        <UIImage size={'100'} src={this.state.goodsItem.titleImage || ''} className={style.goodsImg}/>
+        <div className={style.price}>￥<Text type={'price'}>{this.state.goodsItem.price}</Text></div>
         <div className={style.introduce}>
           {this.state.goodsItem.productName}
         </div>
         <div>
           {
-            this.getCollection(this.state.goodsItem.hasCollection)
+            this.getCollection(this.state.goodsItem.favorite)
           }
         </div>
       </div>
@@ -69,8 +69,8 @@ export default class Index extends Component {
 }
 Index.propTypes = {
   goodsItem: PropTypes.shape({
-    productImageUrl: PropTypes.string,
-    // productPrice:PropTypes.number,
+    titleImage: PropTypes.string,
+    // price:PropTypes.number,
     productName: PropTypes.string,
     isCollectioned: PropTypes.bool
   }),

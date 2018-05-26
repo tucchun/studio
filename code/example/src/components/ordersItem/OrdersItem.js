@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Text } from '../form'
 import { multStyle } from '../../utils/common'
+import { OrderStatus } from '../../consts/dictionary'
 import style from './style.scss'
 
 export default class OrdersItem extends React.Component {
@@ -20,7 +21,8 @@ export default class OrdersItem extends React.Component {
     onClickOrderInfo: PropTypes.func,
     orderTime: PropTypes.number,
     orderId: PropTypes.string,
-    amount: PropTypes.number
+    amount: PropTypes.number,
+    orderStatus: PropTypes.string
   }
 
   doClickOrderInfo () {
@@ -28,7 +30,7 @@ export default class OrdersItem extends React.Component {
   }
 
   render () {
-    let { orderTime, orderId, amount } = this.props
+    let { orderTime, orderId, amount, orderStatus } = this.props
     return (
       <div className={multStyle(style.wrapper, this.props.className)}>
         <div className={style.header}>
@@ -45,7 +47,7 @@ export default class OrdersItem extends React.Component {
           </div>
           <div className={style.state}>
             <div className={style.label}>订单状态：</div>
-            <div className={style['state-value']}>待收货</div>
+            <div className={style['state-value']}>{OrderStatus[orderStatus]}</div>
           </div>
           <div className={style.operate}>
             <div className={style.label} onClick={this.doClickOrderInfo}>订单详情</div>

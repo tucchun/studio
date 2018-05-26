@@ -27,7 +27,7 @@ GoodsInfo.propTypes = {
   goodsItem:PropTypes.shape({
     productImageUrl:PropTypes.string,
     productName:PropTypes.string,
-    productPrice:PropTypes.string,
+    productPrice:PropTypes.number,
     productDesc:PropTypes.string
   })
 }

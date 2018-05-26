@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import style from './style.scss'
 import { multStyle } from '../../../utils/common'
 import PropTypes from 'prop-types'
+import math from 'mathjs'
+import Text from '../../form/Text'
 export default class ShopCartItem extends Component {
   constructor (props) {
     super(props)
@@ -20,13 +22,15 @@ export default class ShopCartItem extends Component {
           <p>白色</p>
         </div>
         <div className={multStyle('pull-left', style.w231)}>
-          <p className={style.price}>¥{this.state.goods.productPrice}</p>
+          <p className={style.price}>¥<Text type={'price'}>{this.state.goods.productPrice}</Text></p>
         </div>
         <div className={multStyle('pull-left', style.w231)}>
           <p>{this.state.goods.count}</p>
         </div>
         <div className={multStyle('pull-left', style.w231, style.subtotal)}>
-          <p className={style.price}>¥{this.state.goods.count * this.state.goods.productPrice}</p>
+          <p className={style.price}>¥<Text type={'price'}>{
+            math.eval(parseInt(this.state.goods.count) * parseFloat(this.state.goods.productPrice))
+          }</Text></p>
         </div>
       </div>
     )
@@ -34,10 +38,10 @@ export default class ShopCartItem extends Component {
 }
 ShopCartItem.propTypes = {
   goods:PropTypes.shape({
-    productPrice:PropTypes.number.isRequired,
+    productPrice:PropTypes.string.isRequired,
     productImageUrl:PropTypes.string.isRequired,
     productName:PropTypes.string.isRequired,
     spec:PropTypes.string.isRequired,
-    count:PropTypes.number.isRequired
+    count:PropTypes.string.isRequired
   }).isRequired
 }

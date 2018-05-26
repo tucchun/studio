@@ -28,11 +28,12 @@ export default class Index extends Component {
   }
   componentDidMount () {
     let loginData = sessionStorage.getItem('loginData')
+    console.log('loginData', loginData)
     if (loginData) {
       loginData = JSON.parse(loginData)
       this.setState({
-        nickName: `${loginData.custSimpleName}-${loginData.contact}`,
-        login: true
+        nickName: loginData.nickName,
+        login: loginData.login
       })
     }
   }
@@ -51,7 +52,7 @@ export default class Index extends Component {
               login ? <div className={style.user}>
                 <span>{nickName}</span>
                 <Link
-                  to={{ pathname: '/orders', hash: '#' }}
+                  to={{ pathname: '/pages/orders', hash: '#' }}
                 >
                   <Button icon='icon-order' className={style['w40']} type='primary' >订单管理</Button>
                 </Link>

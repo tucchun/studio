@@ -1,8 +1,39 @@
 import React from 'react'
+import PropTypes from 'prop-types'
+import { OrderStatus } from '../../../consts/dictionary'
+import { Text } from '../../form'
 import style from './style.scss'
 
 export default class Describe extends React.Component {
+  static propTypes = {
+    orderId: PropTypes.string,
+    orderStatus: PropTypes.string,
+    productCount: PropTypes.string,
+    recipientName: PropTypes.string,
+    recipientProvince: PropTypes.string,
+    recipientCity: PropTypes.string,
+    recipientAddress: PropTypes.string,
+    postCode: PropTypes.string,
+    recipientPhone: PropTypes.string,
+    recipientFxPhone: PropTypes.string,
+    settleMode: PropTypes.string,
+    amount: PropTypes.number
+  }
   render () {
+    let {
+      orderId,
+      orderStatus,
+      productCount,
+      recipientName,
+      recipientProvince,
+      recipientCity,
+      recipientAddress,
+      postCode,
+      recipientPhone,
+      recipientFxPhone,
+      settleMode,
+      amount
+    } = this.props
     return (
       <div className={style.wrapper}>
         <div className={style['describe-item']}>
@@ -12,11 +43,11 @@ export default class Describe extends React.Component {
           <div className={style['describe-info']}>
             <div className={style['describe-item']}>
               <label>订单编号:</label>
-              <span>201804140927000283</span>
+              <span>{orderId}</span>
             </div>
             <div className={style['describe-item']}>
               <label>订单状态:</label>
-              <span>待收货</span>
+              <span>{OrderStatus[orderStatus]}</span>
             </div>
             <div className={style['describe-item']}>
               <label>商品种类(SKU):</label>
@@ -24,7 +55,7 @@ export default class Describe extends React.Component {
             </div>
             <div className={style['describe-item']}>
               <label>商品件数:</label>
-              <span>111</span>
+              <span>{productCount}</span>
             </div>
           </div>
         </div>
@@ -35,27 +66,27 @@ export default class Describe extends React.Component {
           <div className={style['describe-info']}>
             <div className={style['describe-item']}>
               <label>收货人:</label>
-              <span>任跃武</span>
+              <span>{recipientName}</span>
             </div>
             <div className={style['describe-item']}>
               <label>所在地区:</label>
-              <span>广东省深圳市罗湖区</span>
+              <span>{recipientProvince + recipientCity}</span>
             </div>
             <div className={style['describe-item']}>
               <label>详细地址:</label>
-              <span>梨园路6号物资置地大厦 13楼</span>
+              <span>{recipientAddress}</span>
             </div>
             <div className={style['describe-item']}>
               <label>邮政编码:</label>
-              <span>518000</span>
+              <span>{postCode}</span>
             </div>
             <div className={style['describe-item']}>
               <label>手机号码:</label>
-              <span>18637472727</span>
+              <span>{recipientPhone}</span>
             </div>
             <div className={style['describe-item']}>
               <label>固定电话:</label>
-              <span>0755-88273847</span>
+              <span>{recipientFxPhone}</span>
             </div>
           </div>
         </div>
@@ -66,11 +97,11 @@ export default class Describe extends React.Component {
           <div className={style['describe-info']}>
             <div className={style['describe-item']}>
               <label>结款方式:</label>
-              <span>现款现结</span>
+              <span>{settleMode}</span>
             </div>
             <div className={style['describe-item']}>
               <label>应付总额:</label>
-              <span className={style.price}>¥2079.00</span>
+              <span className={style.price}>¥<Text type='price'>{amount}</Text></span>
             </div>
           </div>
         </div>

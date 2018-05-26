@@ -146,13 +146,13 @@
 }
 
 .m-4{
-  background-color: $white-color;
+  background-color: transparent;
   color: $font-primary-color;
   border-color: $white-color;
 }
 
 .m-4:hover{
-  background-color: $white-color;
+  background-color: transparent;
   color: $secondary-color;
   border-color: $white-color;
 }
@@ -242,7 +242,7 @@
 }
 
 .tip{
-    
+
     font-style: normal;
     line-height: 0.6;
     padding: 4px;

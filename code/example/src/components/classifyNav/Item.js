@@ -27,7 +27,7 @@ export default class Item extends Component {
         {
           list && list.map(e => (
             <li key={e.classId}>
-              <Link to={{ pathname: '/prdList', hash: '#', search: `?classId=${e.classId}` }}>
+              <Link to={{ pathname: '/prdList', hash: '#', search: `?firstClassId=${e.classId}` }}>
                 <p><i className={multStyle(style.ititle, style[`ititle${e.classId}`])} /><span>{e.className}</span></p>
               </Link>
               {
@@ -35,14 +35,14 @@ export default class Item extends Component {
                   {
                     e.subFrontClassifyTree && e.subFrontClassifyTree.map(item => (
                       <dl key={item.classId}>
-                        <Link to={{ pathname: '/prdList', hash: '#', search: `?classId=${item.classId}` }}>
+                        <Link to={{ pathname: '/prdList', hash: '#', search: `?firstClassId=${e.classId}&secondClassId=${item.classId}` }}>
                           <dt>{item.className}</dt>
                         </Link>
                         {
                           item.subFrontClassifyTree && item.subFrontClassifyTree.map(k => (
                             <Link
                               key={k.classId}
-                              to={{ pathname: '/prdList', hash: '#', search: `?classId=${k.classId}` }}>
+                              to={{ pathname: '/prdList', hash: '#', search: `?firstClassId=${e.classId}&secondClassId=${item.classId}&thirdClassId=${k.classId}` }}>
                               <dd>{k.className}</dd>
                             </Link>
                           ))

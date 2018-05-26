@@ -9,14 +9,16 @@ import Template from '../template'
 import { Link } from 'react-router-dom'
 import Dialog from '../../components/dialog/index'
 import ajax from '../../utils/ajax'
-
-export default class Balance extends Component {
+import { withIndexTemplate } from '../template'
+import Text from '../../components/form/Text'
+class Balance extends Component {
   constructor (props) {
     super(props)
     this.setAddState = this.setAddState.bind(this)
     this.getAddressList = this.getAddressList.bind(this)
     this.choseAddress = this.choseAddress.bind(this)
     this.newAddress = this.newAddress.bind(this)
+    this.submitOrder = this.submitOrder.bind(this)
     this.state = {
       HeaderNums: {
         cartNums: 10,
@@ -28,42 +30,24 @@ export default class Balance extends Component {
         { name: '消毒用品', href: '/' },
         { name: '消毒液', href: '/' }
       ],
-      choseGoods: [
-        {
-          productCode: 1,
-          productPrice: 123.11,
-          productImageUrl: 'http://img1.imgtn.bdimg.com/it/u=594559231,2167829292&fm=27&gp=0.jpg',
-          productName: '惠普（HP）DJ 2131  彩色喷墨三合一一体机惠众系列',
-          spec: '白色',
-          count: 2
-        },
-        {
-          productCode: 2,
-          productPrice: 123.11,
-          productImageUrl: 'http://img1.imgtn.bdimg.com/it/u=594559231,2167829292&fm=27&gp=0.jpg',
-          productName: '惠普（HP）DJ 2131  彩色喷墨三合一一体机惠众系列',
-          spec: '白色',
-          count: 3
-        },
-        {
-          productCode: 3,
-          productPrice: 123.11,
-          productImageUrl: 'http://img1.imgtn.bdimg.com/it/u=594559231,2167829292&fm=27&gp=0.jpg',
-          productName: '惠普（HP）DJ 2131  彩色喷墨三合一一体机惠众系列',
-          spec: '白色',
-          count: 1
-        }
-      ],
       addressList: [],
       address:{},
+      cartItems:[],
+      cartTotalAmount:'',
       addressShow: true,
       editorShow: false,
+      remark:'',
       dialog: false
     }
   }
 
   componentDidMount () {
     this.getAddressList()
+    if (this.props.location.state) {
+      this.setState({
+        ...this.props.location.state
+      })
+    }
   }
 
   getAddressList () {
@@ -150,10 +134,35 @@ export default class Balance extends Component {
     }
   }
 
+  submitOrder () {
+    let addressList = this.state.addressList
+    let productCodes = this.state.cartItems.map(item => {
+      return item.productCode
+    })
+    let recipientId = ''
+    for (let i in addressList) {
+      if (addressList[i].isChosed) {
+        recipientId = addressList[i].addressId
+      }
+    }
+    let remark = this.state.remark
+    let data = { productCodes, recipientId, remark }
+    ajax({
+      url:'/los/2b-admin-front.subOrderShop',
+      data
+    }).then(res => {
+      this.props.history.push({
+        pathname:'/orderResult',
+        state:res
+      })
+    })
+  }
+
   render () {
+    console.log(this.state)
     return (
-      <Template>
-        <Breadcrumb breads={this.state.breadList}/>
+      <div>
+        <Breadcrumb breads={this.state.breadList} />
         <div className={multStyle(style.addressInfo)}>
           <div className={style.title}>
             收货信息
@@ -180,31 +189,37 @@ export default class Balance extends Component {
             (discrict) => {
               this.newAddress(discrict)
             }
-          }/>
+          } />
         </div>
-        <GoodsTable goodsList={this.state.choseGoods} remarkStatus={'editor'}/>
+        <GoodsTable goodsList={this.state.cartItems} remarkStatus={'editor'} getRemark={
+          (remark) => {
+            this.setState({
+              remark
+            })
+          }
+        } />
         <div className={style.submitInfo}>
           <div className={style.priceTotal}>
             <p>总计</p>
             <div className={'clearfix'}>
               <div className={'pull-left'}>
-                <span>商品种类(SKU)：3</span>
-                <span>商品件数：111</span>
+                <span>商品种类(SKU)：{this.state.totalProductType}</span>
+                <span>商品件数：{this.state.totalProduct}</span>
               </div>
               <div className={'pull-right'}>
-                <span>商品合计：￥2079.00</span>
+                <span>商品合计：￥{parseFloat(this.state.cartTotalAmount).toFixed(2)}</span>
               </div>
             </div>
           </div>
           <div className={'clearfix'}>
-            <div className={style.priceDeal}>应付总额：<span>￥2079.00</span></div>
+            <div className={style.priceDeal}>应付总额：<span>￥{parseFloat(this.state.cartTotalAmount).toFixed(2)}</span></div>
             <div className={'clearfix'}>
               <Link to={'/shopcart'}>
                 <Button className={'pull-left'} icon='icon-back'>返回购物车</Button>
               </Link>
-              <Link to={'/orderResult'} className={'pull-right'}>
-                <Button size='large' type='secondary'>提交订单</Button>
-              </Link>
+              <Button size='large' type='secondary' className={'pull-right'} onClick={
+                this.submitOrder
+              }>提交订单</Button>
             </div>
           </div>
         </div>
@@ -254,7 +269,8 @@ export default class Balance extends Component {
             </div>
           </div>
         </Dialog>
-      </Template>
+      </div>
     )
   }
 }
+export default withIndexTemplate(Balance)

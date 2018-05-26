@@ -19,7 +19,7 @@ export default class Index extends Component {
     this.onSearch = this.search.bind(this)
   }
   search (val) {
-    location.href = `/#/prdList/?q=${val}`
+    location.href = `/#/prdList?q=${val}`
   }
 
   componentDidMount () {

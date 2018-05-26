@@ -19,6 +19,9 @@
   margin:20px auto 100px auto;
   padding:0 30px 30px 30px;
   color:$font-secondary-color;
+  span{
+    margin-right:40px;
+  }
   .priceTotal{
     border-bottom:1px solid $dividing-line-color;
     margin-bottom:20px;

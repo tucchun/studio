@@ -1,7 +1,8 @@
 import { md5 } from './security'
-import { logger, error } from './logger'
+// import { logger, error } from './logger'
+// import { hashHistory } from 'react-router'
 import axios from 'axios'
-import initialStore from '../store'
+// import initialStore from '../store'
 // import message from 'components/Toast'
 let _showLoading = true
 let API_ROOT = `${location.protocol}//${location.host}`
@@ -19,22 +20,19 @@ let shths = (data) => md5(JSON.stringify(data))
 
 axios.interceptors.request.use(config => {
   let data = config.data || {}
-  if (_showLoading) {
-    // _hide = message.loading('')
-  }
   let url = config.url
   const fullUrl = (url.indexOf(API_ROOT) === -1) ? API_ROOT + url : url
   config.url = fullUrl
   data._channel_id = '03'
-  if (initialStore.timestamp) {
-    data.timestamp = initialStore.timestamp + new Date().getTime() - initialStore.localTimestamp
-  } else {
-    data.timestamp = new Date().getTime()
-  }
-  data._deviceId = initialStore.openid
-  if (initialStore.accessToken) {
-    data.accessToken = initialStore.accessToken
-  }
+  // if (initialStore.timestamp) {
+  //   data.timestamp = initialStore.timestamp + new Date().getTime() - initialStore.localTimestamp
+  // } else {
+  data.timestamp = new Date().getTime()
+  // }
+  // data._deviceId = initialStore.openid
+  // if (initialStore.accessToken) {
+  //   data.accessToken = initialStore.accessToken
+  // }
   if (__DEV__) {
     // logger('===============请求接口开始===============\n')
     // logger('请求接口：' + config.url + '\n')
@@ -55,32 +53,35 @@ axios.interceptors.request.use(config => {
 })
 
 axios.interceptors.response.use(response => {
-  if (__DEV__) {
-    // logger('响应数据：' + JSON.stringify(response) + '\n')
-    // logger('===============请求接口结束===============\n')
-  }
-  if (_showLoading) {
-    // _hide()
-  }
-  if (!initialStore.timestamp) {
-    initialStore.timestamp = parseInt(response.now)
-    initialStore.localTimestamp = new Date().getTime()
-  }
-  if (response.status === 200) {
-    const data = response.data || {}
-    if (data.responseCode === '000000') {
-      return data.model
-    } else {
-      if (data.responseCode === 'session.not.exists') {
-        location.reload()
-        return
-      }
-      return data
+  return new Promise((resolve, reject) => {
+    if (__DEV__) {
+      // logger('响应数据：' + JSON.stringify(response) + '\n')
+      // logger('===============请求接口结束===============\n')
     }
-  } else {
-    logger(response.statusText)
-    return new Error(response.statusText)
-  }
+    if (_showLoading) {
+      // _hide()
+    }
+    // if (!initialStore.timestamp) {
+    //   initialStore.timestamp = parseInt(response.now)
+    //   initialStore.localTimestamp = new Date().getTime()
+    // }
+    if (response.status === 200) {
+      const data = response.data || {}
+      if (data.responseCode === '000000') {
+        resolve(data.model)
+      } else {
+        if (data.responseCode === 'user.invalid') {
+          // location.reload()
+          // setTimeout(() => { hashHistory.replace('/login') }, 1000)
+          return
+        }
+        reject(data)
+      }
+    } else {
+      // error(response.statusText)
+      reject(response.statusText)
+    }
+  })
 }, error => {
   if (__DEV__) {
     // logger('响应失败：' + error + '\n')
@@ -91,7 +92,7 @@ axios.interceptors.response.use(response => {
     // _hide()
   }
 
-  return error.response
+  return new Error(error)
 })
 
 // 默认请求设置
@@ -136,4 +137,4 @@ export default function (url, data = {}, config = {}, options = {}) {
   return axios(args)
 }
 
-export const API_ROOT1 = API_ROOT
+// export const API_ROOT1 = API_ROOT

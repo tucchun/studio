@@ -10,28 +10,40 @@ export default class Prd extends React.Component {
   static propTypes = {
     count: PropTypes.number,
     productName: PropTypes.string,
-    unitPrice: PropTypes.number
+    unitPrice: PropTypes.number,
+    url: PropTypes.string,
+    status: PropTypes.string
   }
   render () {
-    let { count, productName, unitPrice } = this.props
+    let { count, productName, unitPrice, url, status } = this.props
+    let btn = null
+    if (status === '20') {
+      btn = (<Button type='m-3' size='small'>确认收货</Button>)
+    } else if (status === '30' || status === '99') {
+      btn = (
+        <React.Fragment>
+          <i className={style['icon-verify']} />
+          <span className={style.verify}>已确认收货</span>
+        </React.Fragment>
+      )
+    }
     return (
       <div className={style['prd-item']}>
         <div className={style['prd-image']}>
-          <Img src='http://b.hi11photos.baidu.com/image/ic/item/314e251f95cad1c85e377d83733e6709c83d5182.jpg' />
+          <Img src={url || ''} />
         </div>
         <div className={style['prd-desc']}>
           <div className={style['prd-desc-title']}>{productName}</div>
           <div className={multStyle(style['prd-desc-other'], 'clearfix')}>
             <div className={multStyle(style['prd-desc-info'], 'pull-left')}>
-              <div className={style['prd-desc-color']}>白色</div>
+              <div className={style['prd-desc-color']}>&nbsp;</div>
               <div className={style['prd-desc-price']}>
                 <span className={style['prd-price']}><i>&yen;</i>{unitPrice}</span>
                 <span className={style['prd-count']}>&times;{count}</span>
               </div>
             </div>
             <div className={multStyle(style['prod-desc-receive'], 'pull-right')}>
-              {/* <Button type='m-3' size='small'>确认收货</Button> */}
-              <i className={style['icon-verify']} /><span className={style.verify}>已确认收货</span>
+              {btn}
             </div>
           </div>
         </div>

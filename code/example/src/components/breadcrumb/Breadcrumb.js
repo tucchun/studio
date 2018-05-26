@@ -6,10 +6,21 @@ import { multStyle } from '../../utils/common'
 import style from './style.scss'
 
 export default class Breadcrumb extends (PureComponent || Component) {
+
+  constructor (props) {
+    super(props)
+    this.doClickItem = this.doClickItem.bind(this)
+  }
+
+  doClickItem (path) {
+    this.props.onClick(path)
+  }
+
   static propTypes = {
     prefix: PropTypes.string,
     className: PropTypes.string,
-    breads: PropTypes.array
+    breads: PropTypes.array,
+    onClick: PropTypes.func
   }
   static defaultProps = {
     prefix: '',
@@ -25,7 +36,7 @@ export default class Breadcrumb extends (PureComponent || Component) {
           {breads &&
             breads.length > 0 &&
             breads.map((item, index) => {
-              return <Item {...item} key={index} />
+              return <Item onClick={this.doClickItem} {...item} key={index} />
             })}
         </div>
       </div>

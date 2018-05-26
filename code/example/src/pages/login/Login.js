@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
-
+import PropTypes from 'prop-types'
 import ajax from '../../utils/ajax'
 import { multStyle } from '../../utils/common'
 import { clearCookie } from '../../utils/utils'
@@ -11,6 +11,9 @@ import { Input, Button } from '../../components/form'
 import logo from '../../assets/icon/images/logo_white.png'
 import style from './style.scss'
 export default class Login extends Component {
+  static propTypes = {
+    location: PropTypes.object
+  }
   constructor (props) {
     super(props)
     this.state = {
@@ -27,7 +30,6 @@ export default class Login extends Component {
     return this.state.username.length > 0 && this.state.userpwd.length > 0
   }
   async login () {
-    console.log(this.state.username, this.state.userpwd)
     clearCookie()
     let k = genAesKey()
     let initData = await ajax({
@@ -64,14 +66,17 @@ export default class Login extends Component {
         redirectToReferrer: true,
         loginData: loginData
       })
-      sessionStorage.setItem('loginData', JSON.stringify(loginData))
+      const loginFrom = {
+        'nickName': `${loginData.custSimpleName}-${loginData.contact}`,
+        'login': true
+      }
+      sessionStorage.setItem('loginData', JSON.stringify(loginFrom))
     } else {
       this.setState({
         isRight: false,
         loginNotice: loginData.responseMsg
       })
     }
-    console.log(loginData)
   }
   render () {
     // from 保存跳转到登录页前的页面路径，用于在登陆成功之后重定向到原来的页面

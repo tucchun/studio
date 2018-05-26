@@ -62,19 +62,19 @@
     }
     .noHover{
         background-color: $white-color;
-				pointer-events: none;
+		pointer-events: none;
 		}
 		.prev.disable{
 			color: $bg-color;
 			background: url(./images/prevDisabled.png) no-repeat;
-      background-position:12px 15px;
+            background-position:12px 15px;
 			border: solid 1px $dividing-line-color;
 			pointer-events: none;
 		}
 		.next.disable{
 			color: $bg-color;
-			background: url(./images/prevDisabled.png) no-repeat;
-			background-position:12px 15px;
+			background: url(./images/nextDisabled.png) no-repeat;
+			background-position:60px 15px;
 			border: solid 1px $dividing-line-color;
 			pointer-events: none;
 		}

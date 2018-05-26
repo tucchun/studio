@@ -5,7 +5,9 @@ import Breadcrumb from '../../components/breadcrumb/index'
 import Template from '../template'
 import { multStyle } from '../../utils/common'
 import { Link } from 'react-router-dom'
-export default class OrderResult extends Component {
+import { withIndexTemplate } from '../template'
+import Text from '../../components/form/Text'
+class OrderResult extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -22,14 +24,19 @@ export default class OrderResult extends Component {
     }
   }
   render () {
-    let success = false, cls = 'icon_success', orderInfo = '', ops = ''
+    let msg = this.props.location.state
+    let success = false
+    let cls = 'icon_success'
+    let orderInfo = ''
+    let ops = ''
+    success = msg.responseCode ? false : true
     cls = success ? cls : 'icon_fail'
     if (success) {
       orderInfo =
         <div>
           <p className={style.tipsMsg}>您的订单提交成功!</p>
-          <p>订单编号：<span>20180504092600184</span></p>
-          <p className={style.orderPrice}>订单总价：<span>￥124.00</span></p>
+          <p>订单编号：<span>{msg.orderNo}</span></p>
+          <p className={style.orderPrice}>订单总价：<span>￥<Text type={'price'}>{msg.orderPriceAmount}</Text></span></p>
         </div>
       ops =
         <div className={multStyle('clearfix', style.mt80)}>
@@ -48,7 +55,7 @@ export default class OrderResult extends Component {
         </div>
     }
     return (
-      <Template>
+      <div>
         <Breadcrumb breads={this.state.breadList} />
         <div className={style.orderResult}>
           <div>
@@ -57,7 +64,8 @@ export default class OrderResult extends Component {
           {orderInfo}
           {ops}
         </div>
-      </Template>
+      </div>
     )
   }
 }
+export default withIndexTemplate(OrderResult)

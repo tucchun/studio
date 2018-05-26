@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import Breadcrumb from '../../components/breadcrumb'
 import { GoodsItem } from '../../components/goodsItem'
 import { withTemplate } from '../template'
@@ -8,6 +9,10 @@ import ajax from '../../utils/ajax'
 import style from './style.scss'
 
 export class Collect extends Component {
+  static propTypes = {
+    context: PropTypes.object,
+    history: PropTypes.object
+  }
   constructor (props) {
     super(props)
     this.state = {
@@ -18,6 +23,27 @@ export class Collect extends Component {
         { name: '收藏夹', href: '#/collect' }
       ]
     }
+    this.doClick = this.doClick.bind(this)
+    this.doLikeClick = this.doLikeClick.bind(this)
+  }
+  doClick (code) {
+    this.props.history.push({
+      pathname: `/prdDetails/${code}`
+    })
+  }
+  doLikeClick (code) {
+    console.log(this.props.context.header)
+    this.props.context.header.toggleHeaderNumber({
+      ...this.props.context.header.headerNums,
+      collectNums: this.props.context.header.headerNums.collectNums + 1
+    })
+    ajax({
+      url: '/los/2b-admin-front.addOrCancelFavorite',
+      data: {
+        productCode: code
+      }
+    })
+    return false
   }
   componentDidMount () {
     const login = sessionStorage.getItem('loginData')
@@ -54,9 +80,14 @@ export class Collect extends Component {
             {
               login ? <div className={multStyle(style['collect-content'], 'clearfix')}>
                 {
-                  goodsList.map(item => (
-                    <GoodsItem goodsItem={item} key={item.productCode} />
-                  ))
+                  goodsList.map(item => {
+                    return <GoodsItem
+                      goodsItem={item}
+                      key={item.productCode}
+                      onClick={() => this.doClick(item.productCode)}
+                      doLikeClick={() => this.doLikeClick(item.productCode)}
+                    />
+                  })
                 }
               </div> : <Unlogin />
             }

@@ -1,88 +1,58 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Breadcrumb from '../../components/breadcrumb'
 import { Process, Describe } from '../../components/ordersItem'
 import { GoodsTable } from '../../components/goodsItem'
-import { withTemplate } from '../template'
-import ajax from '../../utils/ajax'
+import { OrderAction, updateBreadList } from '../../store/actions'
 import { connect } from 'react-redux'
 
 export class OrderInfo extends React.Component {
   constructor (props) {
     super(props)
-    this.state = {
-      HeaderNums: {
-        cartNums: 10,
-        collectNums: 10
-      },
-      breadList: [
-        { name: '首页', href: '/' },
-        { name: '订单管理', href: '/orders' }
-      ],
-      choseGoods: [
-        {
-          productCode: 1,
-          productPrice: 123.11,
-          productImageUrl: 'http://img1.imgtn.bdimg.com/it/u=594559231,2167829292&fm=27&gp=0.jpg',
-          productName: '惠普（HP）DJ 2131  彩色喷墨三合一一体机惠众系列',
-          spec: '白色',
-          count: 2
-        },
-        {
-          productCode: 2,
-          productPrice: 123.11,
-          productImageUrl: 'http://img1.imgtn.bdimg.com/it/u=594559231,2167829292&fm=27&gp=0.jpg',
-          productName: '惠普（HP）DJ 2131  彩色喷墨三合一一体机惠众系列',
-          spec: '白色',
-          count: 3
-        },
-        {
-          productCode: 3,
-          productPrice: 123.11,
-          productImageUrl: 'http://img1.imgtn.bdimg.com/it/u=594559231,2167829292&fm=27&gp=0.jpg',
-          productName: '惠普（HP）DJ 2131  彩色喷墨三合一一体机惠众系列',
-          spec: '白色',
-          count: 1
-        }
-      ]
-    }
+    console.log(props)
   }
 
   componentDidMount () {
-    let { orderId } = this.props.match.params
-    ajax({
-      url: '/los//2b-admin-front.queryOrderDetils',
-      data: {
-        orderNo: orderId
-      }
-    }).then(res => {
-      console.log(JSON.stringify(res))
-      console.log(res)
-    })
+    let { match, dispatch } = this.props
+    let { orderId } = match.params
+    dispatch(updateBreadList([
+      { name: '首页', href: '/' },
+      { name: '订单管理', href: '/pages/orders' },
+      { name: '订单详情', href: `/pages/ordersinfo/${orderId}` }
+    ]))
+    dispatch(OrderAction.fetchOrderInfo({ orderNo: orderId }))
   }
 
   static propTypes = {
-    match: PropTypes.any
+    match: PropTypes.any,
+    ordersInfo: PropTypes.object,
+    dispatch: PropTypes.func
   }
 
   render () {
+    const { ordersInfo } = this.props
+    let orderStatus = ordersInfo.orderStatus
+    let step = 1
+    if (orderStatus === '00') {
+      step = 1
+    } else if (orderStatus === '10') {
+      step = 2
+    } else {
+      step = 3
+    }
     return (
       <React.Fragment>
-        <Breadcrumb breads={this.state.breadList} />
-        <Process />
-        <Describe />
-        <GoodsTable goodsList={this.state.choseGoods} />
+        <Process step={step} />
+        <Describe {...ordersInfo} />
+        <GoodsTable goodsList={ordersInfo.orderShopItems} />
       </React.Fragment>
     )
   }
 }
 const mapStateToProps = state => {
   return {
-    header: state.collects
+    ordersInfo: state.ordersInfo
   }
 }
 export default connect(
   mapStateToProps
 )(OrderInfo)
-
-// export default withTemplate(OrderInfo)

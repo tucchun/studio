@@ -1,11 +1,27 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import style from './style.scss'
 import { multStyle } from '../../../utils/common'
 
 export default class Process extends React.Component {
+  static propTypes = {
+    step: PropTypes.number
+  }
+  static defaultProps = {
+    step: 1
+  }
   render () {
+    let stepClass = ''
+    let step = this.props.step
+    if (step === 1) {
+      stepClass = 'process-edit-active'
+    } else if (step === 2) {
+      stepClass = 'process-edit-active'
+    } else if (step === 3) {
+      stepClass = 'process-done-active'
+    }
     return (
-      <div className={multStyle(style.wrapper, style['process-done-active'])}>
+      <div className={multStyle(style.wrapper, style[stepClass])}>
         <div className={style.item}>
           <div className={style['process-edit']} />
           <div className={multStyle(style['process-text'], style.edit)}>用户下单</div>

@@ -1,33 +1,61 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { GoodsItem } from '../../components/goodsItem'
 import { Item } from '../../components/classifyNav'
 import { multStyle } from '../../utils/common'
 import ajax from '../../utils/ajax'
 import style from './style.scss'
-import { withIndexTemplate } from '../template'
+import { connect } from 'react-redux'
 export class Home extends Component {
+  static propTypes = {
+    context: PropTypes.object,
+    history: PropTypes.object
+  }
   constructor (props) {
     super(props)
     this.state = {
-      HeaderNums: {
-        cartNums: 10,
-        collectNums: 10
-      },
       goodsList: []
     }
+    this.goodsClick = this.goodsClick.bind(this)
+    this.doLikeClick = this.doLikeClick.bind(this)
   }
+  goodsClick (code) {
+    this.props.history.push({
+      pathname: `/prdDetails/${code}`
+    })
+  }
+  doLikeClick (code) {
+    this.props.context.header.toggleHeaderNumber({
+      ...this.props.context.header.headerNums,
+      collectNums: this.props.context.header.headerNums.collectNums + 1
+    })
+    ajax({
+      url: '/los/2b-admin-front.addOrCancelFavorite',
+      data: {
+        productCode: code
+      }
+    })
+    return false
+  }
+  componentWillUnmount () {
+    this.setState = (state, callback) => {
+      //
+    }
+  }
+
   componentDidMount () {
     ajax({
       url: '/los/2b-admin-front.productPageList',
       method: 'POST',
       data: {
-        pageNo: 1,
+        pageNo: 0,
         pageSize: 10
       }
     }).then(res => {
-      if (res && res.productInfoVOList) {
+      console.log(res)
+      if (res && res.list) {
         this.setState({
-          goodsList: res.productInfoVOList
+          goodsList: res.list
         })
       }
     })
@@ -59,7 +87,12 @@ export class Home extends Component {
             <div className={multStyle(style['goods-content'], 'clearfix')}>
               {
                 goodsList.map(goodsItem => {
-                  return <GoodsItem goodsItem={goodsItem} key={goodsItem.productCode} />
+                  return <GoodsItem
+                    goodsItem={goodsItem}
+                    key={goodsItem.productCode}
+                    onClick={() => this.goodsClick(goodsItem.productCode)}
+                    collection={() => this.doLikeClick(goodsItem.productCode)}
+                  />
                 })
               }
             </div>
@@ -69,5 +102,11 @@ export class Home extends Component {
     )
   }
 }
-
-export default withIndexTemplate(Home)
+const mapStateToProps = state => {
+  return {
+    header: state.collects
+  }
+}
+export default connect(
+  mapStateToProps
+)(Home)

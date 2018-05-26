@@ -17,10 +17,10 @@ export class PrdDetails extends Component {
     this.doTotalPrice = this.doTotalPrice.bind(this)
     this.mouseEnterHandle = this.mouseEnterHandle.bind(this)
     this.mouseLeaveHandle = this.mouseLeaveHandle.bind(this)
-    this.scrollBotm = this.scrollBotm.bind(this)
-    this.scrollTop = this.scrollTop.bind(this)
-    this.doAddCart = this.doAddCart.bind(this)
-    this.doAddCollect = this.doAddCollect.bind(this)
+    this.scrollBotmClick = this.scrollBotmClick.bind(this)
+    this.scrollTopClick = this.scrollTopClick.bind(this)
+    this.doAddCartClick = this.doAddCartClick.bind(this)
+    this.doAddCollectClick = this.doAddCollectClick.bind(this)
     this.state = {
       HeaderNums: {
         cartNums: 10,
@@ -32,36 +32,27 @@ export class PrdDetails extends Component {
         { name: '消毒用品', href: '/#/prdList' },
         { name: '消毒液', href: '/#/prdList' }
       ],
-      curImgSrc: 'https://img14.360buyimg.com/n0/jfs/t5326/335/2442088867/75285/d768d6af/591ad13fN772df84b.jpg',
-      topImgIndex: 0,
-      botmImgIndex: 7,
-      topArrDis: true,
-      botmArrDis:false,
-      smlImgList: [
-        { imgSrc: 'https://img14.360buyimg.com/n0/jfs/t5326/335/2442088867/75285/d768d6af/591ad13fN772df84b.jpg' },
-        { imgSrc: 'https://img10.360buyimg.com/n5/jfs/t5320/235/2315143320/88868/3aa55f4a/591ad13fNc7f83a3d.jpg.dpg' },
-        { imgSrc: 'https://img10.360buyimg.com/n5/jfs/t5179/224/2421287818/75020/38c2c8ac/591ad140N84e7043b.jpg.dpg' },
-        { imgSrc: 'https://img10.360buyimg.com/n5/jfs/t5341/177/2410072104/169272/159fe13b/591ad140Naf0c8122.jpg.dpg' },
-        { imgSrc: 'https://img10.360buyimg.com/n5/jfs/t5173/260/2451026594/55068/a75d0bab/591ad141N25538629.jpg.dpg' },
-        { imgSrc: 'https://img20.360buyimg.com/vc/jfs/t3187/239/5708393640/32682/3a611a87/587890ceNb2511638.jpg' },
-        { imgSrc: '' }
-      ],
-      lagImgList:[
-        { imgSrc: 'https://img20.360buyimg.com/vc/jfs/t9667/79/979944729/170490/c189fb30/59db1a92N2a369e4b.jpg' },
-        { imgSrc: 'https://img20.360buyimg.com/vc/jfs/t3988/174/1453316097/170768/5f0ebd3c/587890c4Nb0c3534a.jpg' },
-        { imgSrc: 'https://img20.360buyimg.com/vc/jfs/t4093/239/1434318159/170617/8efff54c/58789100Nb23e5676.jpg' }
-      ],
-      prdInfo:{ },
-      prcsCount: 1 // 购买数量
+      curImgSrc: '', // 当前大图显示地址
+      topImgIndex: 0, // 顶端图下标
+      botmImgIndex: 5, // 最底端图下标
+      topArrDis: true, // 上箭头是否不可用 默认不可用
+      botmArrDis:false, // 下箭头是否不可用 默认可用
+      smlImgList: [], // 小图列表
+      lagImgList:[], // 详情大图列表
+      prdInfo: {}, // 商品详情信息
+      prcsCount: 1, // 购买数量
+      prdCode: '' // 详情页商品代码
     }
   }
   static propTypes = {
-    context: PropTypes.object
+    context: PropTypes.object,
+    match: PropTypes.object
   }
 
   componentWillMount () {
-    let prdCode = location.href.split('code?=')[1]
-    console.log(prdCode)
+    // let prdCode = location.href.split('')[1]
+    let prdCode = this.props.match.params.prdCode
+    this.setState({ prdCode: prdCode })
     ajax({
       url: '/los/2b-admin-front.getProductDetails',
       data: {
@@ -69,57 +60,69 @@ export class PrdDetails extends Component {
       }
     }).then(res => {
       // 成功回调
-      console.log(res)
       let lagImgList = []
       let smlImgList = []
+      let imgList = res.productAttaches
+      lagImgList = imgList.filter(item => item.attachType === '09')
+      lagImgList = (lagImgList) && lagImgList.sort((a, b) => a.attachOrder - b.attachOrder)
+      smlImgList = imgList.filter(item => item.attachType === '01')
+      console.log(smlImgList)
+      console.log(lagImgList)
       this.setState({
-        prdInfo: res
+        prdInfo: res,
+        smlImgList: smlImgList,
+        lagImgList: lagImgList,
+        botmImgIndex: smlImgList.length,
+        curImgSrc: smlImgList[0].url,
+        botmArrDis: smlImgList.length <= 5
       })
     })
   }
-  doDescClick () {
+  doDescClick () { // 减事件
     this.setState({ prcsCount: this.state.prcsCount > 1 ? this.state.prcsCount - 1 : 1 })
   }
-  doIncreClick () {
+  doIncreClick () { // 加事件
     this.setState({ prcsCount: this.state.prcsCount + 1 })
   }
-  changeHandle () {
+  changeHandle () { // 输入事件
     if (Number(this.refs.iptVal.value)) {
       this.setState({ prcsCount: Number(this.refs.iptVal.value) })
     }
   }
-  doAddCart () {
-    this.props.context.header.toggleHeaderNumber({
+  doAddCartClick () { // 添加购物车
+    console.log(this.props.context)
+    /* this.props.context.header.toggleHeaderNumber({
       ...this.props.context.header.headerNums,
       cartNums: this.props.context.header.headerNums.cartNums + 1
-    })
+    }) */
+    console.log(this.props.context)
     ajax({
       url: '/los/2b-admin-front.addCar',
       data: {
-        productCode: this.prdInfo.productCode,
+        productCode: this.state.prdCode,
         productNum: this.refs.iptVal.value
       }
     })
   }
-  doAddCollect () {
-    this.props.context.header.toggleHeaderNumber({
+  doAddCollectClick () { // 添加收藏
+    /* this.props.context.header.toggleHeaderNumber({
       ...this.props.context.header.headerNums,
       collectNums: this.props.context.header.headerNums.collectNums + 1
-    })
+    }) */
     ajax({
       url: '/los/2b-admin-front.addOrCancelFavorite',
       data: {
-        productCode: this.prdInfo.productCode
+        productCode: this.state.prdCode
       }
     })
   }
-  mouseEnterHandle (e) {
+  mouseEnterHandle (e) { // 鼠标滑入事件
     this.setState({ curImgSrc: e.target.src })
   }
   mouseLeaveHandle () {
 
   }
-  scrollBotm () {
+  scrollBotmClick () { // 上翻事件
     if (this.state.topImgIndex < this.state.botmImgIndex - 5) {
       this.setState({
         topImgIndex: this.state.topImgIndex + 1,
@@ -128,7 +131,7 @@ export class PrdDetails extends Component {
       })
     }
   }
-  scrollTop () {
+  scrollTopClick () { // 下翻事件
     if (this.state.topImgIndex > 0) {
       this.setState({
         topImgIndex: this.state.topImgIndex - 1,
@@ -137,8 +140,8 @@ export class PrdDetails extends Component {
       })
     }
   }
-  doTotalPrice () {
-    return math.eval(this.state.prcsCount * this.state.prdInfo.productPrice).toFixed(2)
+  doTotalPrice () { // 总价函数
+    return math.eval(this.state.prcsCount * this.state.prdInfo.price).toFixed(2)
   }
   render () {
     let smlImgList = this.state.smlImgList
@@ -148,6 +151,7 @@ export class PrdDetails extends Component {
     let topImgIndex = this.state.topImgIndex
     let topArrDis = this.state.topArrDis
     let botmArrDis = this.state.botmArrDis
+    console.log(prdInfo)
     return (
       <React.Fragment>
         <Breadcrumb breads={this.state.breadList} />
@@ -158,16 +162,16 @@ export class PrdDetails extends Component {
                 <img className={style.bigImg} src={curImgSrc} />
               </div>
               <div className={style.smlImgBox}>
-                <div onClick={this.scrollTop}
+                <div onClick={this.scrollTopClick}
                   className={topArrDis ? multStyle(style.prevArrow, style.disabled) : style.prevArrow} />
                 <div className={style.scrollBox}>
                   {
                     smlImgList.map((img, index) => {
                       if (index >= topImgIndex && index < topImgIndex + 5) {
                         return (
-                          <div className={style.smlImgDiv} key={img.imgSrc}>
+                          <div className={style.smlImgDiv} key={img.attachId}>
                             <img onMouseEnter={this.mouseEnterHandle}
-                              onMouseLeave={this.mouseLeaveHandle} src={img.imgSrc} className={style.smlImg} />
+                              onMouseLeave={this.mouseLeaveHandle} src={img.url} className={style.smlImg} />
                           </div>
                         )
                       }
@@ -175,19 +179,20 @@ export class PrdDetails extends Component {
                   }
 
                 </div>
-                <div onClick={this.scrollBotm}
+                <div onClick={this.scrollBotmClick}
                   className={botmArrDis ? multStyle(style.disabled, style.nextArrow) : style.nextArrow} />
               </div>
               <div className={multStyle(style.clearfix, style.dtlBox)}>
                 <h4 className={style.prdInfoTitle}>
-                  { prdInfo.title }
+                  { prdInfo.productName }
                 </h4>
                 <div className={style.prdInfoBox}>
                   <div className={style.prdInfoPrice}>
                     <span className={style.label}>价格</span>
                     <span className={style.priceBox}>
                       <span className={style.red}>￥</span>
-                      <span className={multStyle(style.red, style.prdInfoPriceNum)}>{prdInfo.productPrice ? parseFloat(prdInfo.productPrice).toFixed(2) : '无'}</span>
+                      <span className={multStyle(style.red, style.prdInfoPriceNum)}>
+                        {prdInfo.price ? parseFloat(prdInfo.price).toFixed(2) : '无'}</span>
                     </span>
                   </div>
                   <div className={style.Spec}>
@@ -196,7 +201,7 @@ export class PrdDetails extends Component {
                   </div>
                   <div className={style.prdBrand}>
                     <span className={style.label}>商品品牌</span>
-                    <span className={style.prdInfoBrand}>{prdInfo.prdBrand}</span>
+                    <span className={style.prdInfoBrand}>{prdInfo.brandName}</span>
                   </div>
                 </div>
                 <div className={style.prcsBox}>
@@ -214,8 +219,12 @@ export class PrdDetails extends Component {
                     <span className={multStyle(style.red, style.totalPrice)}>￥{this.doTotalPrice()} </span>
                   </div>
                   <div className={style.buttonBox}>
-                    <Button size='normal' className={style['add-cart']} type='secondary' onClick={this.doAddCart}>加入购物车</Button>
-                    <Button className={style['add-collect']} icon='icon-start-collect-1' onClick={this.doAddCollect}>加入收藏夹</Button>
+                    <Button disabled={(prdInfo.status !== '1')} size='normal'
+                      className={style['add-cart']} type='secondary'
+                      onClick={this.doAddCartClick}>加入购物车</Button>
+                    <Button disabled={(prdInfo.status !== '1')}
+                      className={style['add-collect']} icon='icon-start-collect-1'
+                      onClick={this.doAddCollectClick}>加入收藏夹</Button>
                   </div>
                 </div>
               </div>
@@ -227,7 +236,7 @@ export class PrdDetails extends Component {
               <span className={style.titleText}>商品描述</span>
             </div>
             <div className={style.dtlDesc}>
-              <p className={style.dtlBrand}>品牌 :{prdInfo.prdBrand}</p>
+              <p className={style.dtlBrand}>品牌 : {prdInfo.brandName}</p>
               <ul className={style.dtlOtherBox}>
                 <li className={style.dtlLine}>
                   <span className={style.dtlLabel}>商品名称 : </span>
@@ -275,8 +284,8 @@ export class PrdDetails extends Component {
               {
                 lagImgList.map(img => {
                   return (
-                    <div className={style.lagImgBox} key={img.imgSrc}>
-                      <img src={img.imgSrc} className={style.lagImg} />
+                    <div className={style.lagImgBox} key={img.url}>
+                      <img src={img.url} className={style.lagImg} />
                     </div>)
                 })
               }

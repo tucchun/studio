@@ -7,8 +7,10 @@ import { multStyle } from '../../../utils/common'
 export default class EditorCount extends Component {
   constructor (props) {
     super(props)
+    this.updateCount = this.updateCount.bind(this)
     this.state = {
-      count: props.count
+      count: props.count,
+      isUseable:props.isUseable
     }
   }
 
@@ -21,26 +23,30 @@ export default class EditorCount extends Component {
     // console.log('ddddd')
   }
 
+  updateCount (count) {
+    let counts = parseInt(count)
+    if (this.props.isUseable) {
+      this.props.changeCount(counts)
+      this.setState({
+        count:counts
+      })
+    }
+  }
+
   render () {
     return (
       <div className={style.editorCount}>
         <Button className={multStyle(style.button, style.minus)} onClick={
           () => {
             let count = this.state.count
-            count = count - 1 > 0 ? count - 1 : 1
-            this.props.changeCount(count)
-            this.setState({
-              count
-            })
+            count = count - 1 || 1
+            this.updateCount(count)
           }
         }>-</Button>
         <Input className={style.count} value={this.state.count} onChange={
           (obj) => {
             if (obj.value > 0) {
-              this.props.changeCount(obj.value)
-              this.setState({
-                count: parseInt(obj.value)
-              })
+              this.updateCount(obj.value)
             }
           }
         }/>
@@ -48,10 +54,7 @@ export default class EditorCount extends Component {
           () => {
             let count = this.state.count
             count++
-            this.props.changeCount(count)
-            this.setState({
-              count
-            })
+            this.updateCount(count)
           }
         }>+</Button>
       </div>
@@ -60,5 +63,6 @@ export default class EditorCount extends Component {
 }
 EditorCount.propTypes = {
   count: PropTypes.number.isRequired,
-  changeCount: PropTypes.func.isRequired
+  changeCount: PropTypes.func.isRequired,
+  isUseable:PropTypes.bool
 }

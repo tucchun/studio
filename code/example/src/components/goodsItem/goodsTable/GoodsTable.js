@@ -7,11 +7,29 @@ import PropTypes from 'prop-types'
 export default class GoodsTable extends Component {
   constructor (props) {
     super(props)
+    this.changeRemark = this.changeRemark.bind(this)
     this.state = {
       goodsList:props.goodsList,
-      remark:'的点点滴滴大多付'
+      remark:''
     }
   }
+
+  componentWillReceiveProps (nextProps) {
+    this.setState({
+      goodsList:nextProps.goodsList
+    })
+  }
+
+  changeRemark (obj) {
+    this.setState({
+      ...this.state,
+      remark:obj.value
+    })
+    if (this.props.getRemark) {
+      this.props.getRemark(this.state.remark)
+    }
+  }
+
   render () {
     return (
       <div className={style.wrap_item}>
@@ -31,12 +49,7 @@ export default class GoodsTable extends Component {
         <div className={style.remark}>
           <span>备注：</span>
           {this.props.remarkStatus === 'editor' ? <Input className={style.remark_input} onChange={
-            (obj) => {
-              this.setState({
-                ...this.state,
-                remark:obj.value
-              })
-            }
+            this.changeRemark
           } name={'remark'} value={this.state.remark} placeholder={'可以说出您的要求'} /> : <span className={style.remark_text}>{this.state.remark}</span>}
         </div>
       </div>
@@ -45,5 +58,6 @@ export default class GoodsTable extends Component {
 }
 GoodsTable.propTypes = {
   goodsList:PropTypes.array.isRequired,
-  remarkStatus:PropTypes.oneOf(['editor', 'show'])
+  remarkStatus:PropTypes.oneOf(['editor', 'show']),
+  getRemark:PropTypes.func
 }

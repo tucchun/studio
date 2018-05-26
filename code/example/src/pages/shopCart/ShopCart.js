@@ -5,14 +5,12 @@ import { Checkbox, Button } from '../../components/form/index'
 import style from './style.scss'
 import GoodsInfo from './goodsInfo/GoodsInfo'
 import EditorCount from './editorCount/EditorCount'
-import PropTypes from 'prop-types'
-import Dialog from '../../components/dialog/index'
-import Template from '../template'
 import ajax from '../../utils/ajax'
-import { Link } from 'react-router-dom'
 import math from 'mathjs'
+import { withIndexTemplate } from '../template'
+import Text from '../../components/form/Text'
 
-export default class ShopCart extends Component {
+class ShopCart extends Component {
   constructor (props) {
     super(props)
     this.getAllCheck = this.getAllCheck.bind(this)
@@ -21,6 +19,7 @@ export default class ShopCart extends Component {
     this.delArray = this.delArray.bind(this)
     this.getAllprice = this.getAllprice.bind(this)
     this.changeCount = this.changeCount.bind(this)
+    this.submitOrder = this.submitOrder.bind(this)
     this.state = {
       ...props,
       breadList: [
@@ -29,66 +28,31 @@ export default class ShopCart extends Component {
         { name: '消毒用品', href: '/' },
         { name: '消毒液', href: '/' }
       ],
-      // goodsList:props.goodsList,
-      goodsList: [
-        {
-          productCode: '0000000002',
-          productImageUrl: 'https://img14.360buyimg.com/n0/jfs/t5326/335/2442088867/75285/d768d6af/591ad13fN772df84b.jpg',
-          productName: '惠普（HP）DJ 2131  彩色喷墨三合一一体机惠众系列',
-          productPrice: '121.11',
-          productDesc: '白色',
-          productNum: 3,
-          checked: false
-        },
-        {
-          productCode: '0000000003',
-          productImageUrl: 'https://img14.360buyimg.com/n0/jfs/t5326/335/2442088867/75285/d768d6af/591ad13fN772df84b.jpg',
-          productName: '惠普（HP）DJ 2131  彩色喷墨三合一一体机惠众系列',
-          productPrice: '121.11',
-          productDesc: '蓝色',
-          productNum: 1,
-          checked: false
-        },
-        {
-          productCode: '0000000004',
-          productImageUrl: 'https://img14.360buyimg.com/n0/jfs/t5326/335/2442088867/75285/d768d6af/591ad13fN772df84b.jpg',
-          productName: '惠普（HP）DJ 2131  彩色喷墨三合一一体机惠众系列',
-          productPrice: '121.11',
-          productDesc: '红色',
-          productNum: 2,
-          checked: true
-        },
-        {
-          productCode: '0000000005',
-          productImageUrl: 'https://img14.360buyimg.com/n0/jfs/t5326/335/2442088867/75285/d768d6af/591ad13fN772df84b.jpg',
-          productName: '惠普（HP）DJ 2131  彩色喷墨三合一一体机惠众系列',
-          productPrice: '121.11',
-          productDesc: '青色',
-          productNum: 1,
-          checked: true
-        }
-      ],
+      goodsList: [],
       allCheck: false,
       checkedProductCode: [],
-      dialogStatus:false
+      dialogStatus: false
     }
   }
 
-  componentWillMount () {
+  componentDidMount () {
     // this.getAllCheck()
     let checkedProductCode = this.setCheckProduct()
     ajax({
-      url:'/los/2b-admin-front.getCartList'
+      url: '/los/2b-admin-front.getCartList'
     }).then(res => {
-      console.log(res)
+      if (!res.responseCode) {
+        let goodsList = res.cartItems
+        for (let i in goodsList) {
+          goodsList[i].count = parseInt(goodsList[i].count)
+          goodsList[i].productPrice = parseFloat(goodsList[i].productPrice)
+        }
+        this.setState({
+          checkedProductCode,
+          goodsList
+        })
+      }
     })
-    this.setState({
-      checkedProductCode
-    })
-    // 页面加载获取购物车数据
-    const shopcartId = this.state.match.params.id
-    console.log(shopcartId)
-    // 发起ajax请求，获取购物车
   }
 
   getAllCheck () {
@@ -96,7 +60,11 @@ export default class ShopCart extends Component {
     let allCheck = this.state.allCheck ? false : true
     let goodsList = this.state.goodsList
     for (let i in goodsList) {
-      goodsList[i].checked = allCheck
+      if (parseInt(goodsList[i].productStatus) !== 1) {
+        goodsList[i].checked = false
+      } else {
+        goodsList[i].checked = allCheck
+      }
     }
     let checkedProductCode = this.setCheckProduct()
     this.setState({
@@ -112,16 +80,19 @@ export default class ShopCart extends Component {
     let allCheck = false
     for (let i in goodsList) {
       goodsList[i].checked = false
-      for (let j in goodsItem) {
-        if (goodsList[i].productCode === goodsItem[j]) {
-          goodsList[i].checked = true
-        }
+      let prodCode = goodsList[i].productCode
+      let status = parseInt(goodsList[i].productStatus)
+      let index = goodsItem.indexOf(prodCode)
+      if (index >= 0 && status === 1) {
+        goodsList[i].checked = true
+      }
+      if (index >= 0 && status !== 1) {
+        goodsItem.splice(index, 1)
       }
     }
     if (goodsList.length === goodsItem.length) {
       allCheck = true
     }
-    console.log(goodsItem)
     this.setState({
       checkedProductCode: goodsItem,
       goodsList,
@@ -133,10 +104,11 @@ export default class ShopCart extends Component {
     // 设置选中数组
     let goodsList = this.state.goodsList, checkedProductCode = []
     for (let i in goodsList) {
-      if (goodsList[i].checked) {
+      if (goodsList[i].checked && parseInt(goodsList[i].productStatus) === 1) {
         checkedProductCode.push(goodsList[i].productCode)
       }
     }
+    console.log(checkedProductCode)
     return checkedProductCode
   }
 
@@ -146,14 +118,14 @@ export default class ShopCart extends Component {
     let prodCodes = []
     prodCodes.push(prodCode)
     ajax({
-      url:'/los/2b-admin-front.deleteCart',
-      data:{
-        productCodes:prodCodes
+      url: '/los/2b-admin-front.deleteCart',
+      data: {
+        productCodes: prodCodes
       }
     }).then(response => {
       if (response.responseCode === '999999') {
         this.setState({
-          dialogStatus:true
+          dialogStatus: true
         })
         return false
       }
@@ -173,9 +145,9 @@ export default class ShopCart extends Component {
     let targetArray = this.state.checkedProductCode
     let goodsList = this.state.goodsList
     ajax({
-      url:'/los/2b-admin-front.deleteCart',
-      data:{
-        productCodes:targetArray
+      url: '/los/2b-admin-front.deleteCart',
+      data: {
+        productCodes: targetArray
       }
     }).then(res => {
       console.log(res)
@@ -194,21 +166,39 @@ export default class ShopCart extends Component {
 
   changeCount (count, prodCode) {
     // 更改商品数目
-    console.log(count)
     let goodsList = this.state.goodsList
     for (let i in goodsList) {
       if (goodsList[i].productCode === prodCode) {
-        goodsList[i].productNum = count
+        goodsList[i].count = count
       }
     }
+    this.setState({
+      goodsList
+    })
     ajax({
-      url:'/los/2b-admin-front.changeCartNum',
-      data:{ productCode:prodCode, productNum: count }
+      url: '/los/2b-admin-front.changeCartNum',
+      data: { productCode: prodCode, productNum: count }
     }).then(response => {
       console.log(response)
     })
-    this.setState({
-      goodsList
+  }
+
+  submitOrder () {
+    let productCodes = this.state.checkedProductCode
+    ajax({
+      url: '/los/2b-admin-front.buyOrderShop',
+      data: {
+        productCodes
+      }
+    }).then(res => {
+      if (res.responseCode) {
+        alert(res.responseMsg)
+      } else {
+        this.props.history.push({
+          pathname: '/balance',
+          state: res
+        })
+      }
     })
   }
 
@@ -220,17 +210,17 @@ export default class ShopCart extends Component {
     let allCount = 0
     for (let i in goodsList) {
       if (goodsList[i].checked) {
-        allPrice += (math.eval(goodsList[i].productNum * goodsList[i].productPrice))
+        allPrice += (math.eval(goodsList[i].count * goodsList[i].productPrice))
         sku += 1
-        allCount += parseInt(goodsList[i].productNum)
+        allCount += goodsList[i].count
       }
     }
-    return { allPrice:allPrice.toFixed(2), sku, allCount }
+    return { allPrice: allPrice, sku, allCount }
   }
 
   render () {
     return (
-      <Template>
+      <div>
         <Breadcrumb breads={this.state.breadList}/>
         <div className={style.shop_cart}>
           <ul className={multStyle(style.tableHeader, style.clearfix)}>
@@ -262,49 +252,50 @@ export default class ShopCart extends Component {
                   this.setChecked(value)
                 }
               }>
-                {this.state.goodsList.map(goodsItem => {
-                  console.log(this.state.goodsList.length)
-                  return (
-                    <li className={multStyle(style.clearfix, goodsItem.checked ? style.checked : '')}
-                        key={goodsItem.productCode}>
-                      <div className={multStyle(style['pull-left'], style.w78)}>
-                        <div>
-                          <Checkbox value={goodsItem.productCode} checked={goodsItem.checked}/>
+                {
+                  this.state.goodsList.map(goodsItem => {
+                    return (
+                      <li className={multStyle(style.clearfix, goodsItem.checked ? style.checked : '')}
+                          key={goodsItem.productCode}>
+                        <div className={multStyle(style['pull-left'], style.w78)}>
+                          <div>
+                            <Checkbox value={goodsItem.productCode} checked={goodsItem.checked}/>
+                          </div>
                         </div>
-                      </div>
-                      <GoodsInfo goodsItem={goodsItem}/>
-                      <div className={multStyle(style.w164, style['pull-left'], style.price)}>
-                        <div>
-                          ￥{goodsItem.productPrice}
+                        <GoodsInfo goodsItem={goodsItem}/>
+                        <div className={multStyle(style.w164, style['pull-left'], style.price)}>
+                          <div>
+                            ￥<Text type={'price'}>{goodsItem.productPrice}</Text>
+                          </div>
                         </div>
-                      </div>
-                      <div className={multStyle(style.w164, style['pull-left'])}>
-                        <div>
-                          <EditorCount count={parseInt(goodsItem.productNum)} changeCount={
-                            (count) => {
-                              let prodCode = goodsItem.productCode
-                              this.changeCount(count, prodCode)
-                            }
-                          }/>
+                        <div className={multStyle(style.w164, style['pull-left'])}>
+                          <div>
+                            <EditorCount count={parseInt(goodsItem.count)} changeCount={
+                              (count) => {
+                                let prodCode = goodsItem.productCode
+                                this.changeCount(count, prodCode)
+                              }
+                            } isUseable={parseInt(goodsItem.productStatus) === 1 ? true : false} />
+                          </div>
                         </div>
-                      </div>
-                      <div className={multStyle(style.w164, style['pull-left'], style.align_right, style.price)}>
-                        <div>
-                          ￥{goodsItem.productPrice * goodsItem.productNum}
+                        <div className={multStyle(style.w164, style['pull-left'], style.align_right, style.price)}>
+                          <div>
+                            ￥{math.eval(parseFloat(goodsItem.productPrice) * parseInt(goodsItem.count)).toFixed(2)}
+                          </div>
                         </div>
-                      </div>
-                      <div className={multStyle(style.w164, style['pull-left'])}>
-                        <div>
-                          <Button size={'smaller'} type={'m-4'} icon={'icon-delete'} onClick={
-                            () => {
-                              this.delGoods(goodsItem.productCode)
-                            }
-                          }>删除</Button>
+                        <div className={multStyle(style.w164, style['pull-left'])}>
+                          <div>
+                            <Button size={'smaller'} type={'m-4'} icon={'icon-delete'} onClick={
+                              () => {
+                                this.delGoods(goodsItem.productCode)
+                              }
+                            }>删除</Button>
+                          </div>
                         </div>
-                      </div>
-                    </li>
-                  )
-                })}
+                      </li>
+                    )
+                  })
+                }
               </Checkbox.Group>
             </ul>
           </div>
@@ -332,22 +323,16 @@ export default class ShopCart extends Component {
               </div>
               <div className={multStyle(style['pull-left'], style.price)}>
                 商品总价：
-                <span>￥{this.getAllprice().allPrice}</span>
+                <span>￥{this.getAllprice().allPrice.toFixed(2)}</span>
               </div>
-              <Link to={'balance'}>
-                <Button size={'large'} type={'secondary'} className={style['pull-right']} >下单</Button>
-              </Link>
+              <Button onClick={this.submitOrder} size={'large'} type={'secondary'}
+                      className={style['pull-right']}>下单</Button>
             </li>
           </ul>
         </div>
-        <Dialog show={this.state.dialogStatus}>
-          删除失败
-          <Button type='primary' onClick={() => this.setState({ dialogStatus: false })}>关闭Dialog</Button>
-        </Dialog>
-      </Template>
+      </div>
     )
   }
 }
-ShopCart.propTypes = {
-  goodsList: PropTypes.array
-}
+
+export default withIndexTemplate(ShopCart)
