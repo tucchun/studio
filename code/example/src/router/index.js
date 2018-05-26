@@ -4,7 +4,7 @@ import { withRouter } from "react-router";
 // import AsyncComponent from '../components/asyncComponent'
 import Loadable from "react-loadable";
 import { Loading } from "../components/loading";
-
+import AsyncComponent from '../components/asyncComponent'
 export function asyncComponent(importComponent) {
   class AsyncComponent extends React.Component {
     constructor(props) {
@@ -229,10 +229,7 @@ function fn (routes) {
   routes.forEach((route, i) => {
     let __route__ = {
       ...route,
-      component: Loadable({
-        loader: route.component,
-        loading: Loading
-      })
+      component: AsyncComponent(route.component)
     }
     if (__route__.routes) {
       let __routes__ = fn(__route__.routes)
