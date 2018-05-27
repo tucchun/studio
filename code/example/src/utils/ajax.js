@@ -1,6 +1,5 @@
 import { md5 } from './security'
 import axios from 'axios'
-let _showLoading = true
 let API_ROOT = `${location.protocol}//${location.host}`
 if (!__RUN_IN_PRD__) {
   API_ROOT = `${location.protocol}//${location.host}/ec`
@@ -54,13 +53,12 @@ axios.interceptors.response.use(response => {
       // logger('响应数据：' + JSON.stringify(response) + '\n')
       // logger('===============请求接口结束===============\n')
     }
-    if (_showLoading) {
-      // _hide()
-    }
+  
     // if (!initialStore.timestamp) {
     //   initialStore.timestamp = parseInt(response.now)
     //   initialStore.localTimestamp = new Date().getTime()
     // }
+    debugger
     if (response.status === 200) {
       const data = response.data || {}
       if (data.responseCode === '000000') {
@@ -70,7 +68,10 @@ axios.interceptors.response.use(response => {
           // location.reload()
           // setTimeout(() => { HashRouter.replace('/login') }, 1000)
           import('history/createHashHistory').then(createhashHistory => {
-            createhashHistory.default().replace('/login')
+            // createhashHistory.default().replace('/login')
+            setTimeout(() => {
+              createhashHistory.default().replace('/login')
+            })
           })
           reject(data.responseCode)
         }
@@ -85,10 +86,6 @@ axios.interceptors.response.use(response => {
   if (__DEV__) {
     // logger('响应失败：' + error + '\n')
     // logger('===============请求接口结束===============\n')
-  }
-
-  if (_showLoading) {
-    // _hide()
   }
 
   return new Error(error)
