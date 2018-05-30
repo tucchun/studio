@@ -1,44 +1,24 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { multStyle } from '../../utils/common'
-import ajax from '../../utils/ajax'
 import { Button } from '../form/index'
 import style from './style.scss'
-export default class Index extends Component {
+export default class SiteNav extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      nickName: '',
-      login: false
-    }
-    this.logout = this.logout.bind(this)
+    this.doClick = this.doClick.bind(this)
   }
   logout () {
-    const that = this
-    ajax({
-      url: '/los/2b-admin-front.logout'
-    }).then(res => {
-      if (!(res && res.responseCode)) {
-        sessionStorage.clear()
-        that.setState({
-          login: false
-        })
-      }
-    })
+
+  }
+  doClick () {
+    this.props.onLogout()
   }
   componentDidMount () {
-    let loginData = sessionStorage.getItem('loginData')
-    console.log('loginData', loginData)
-    if (loginData) {
-      loginData = JSON.parse(loginData)
-      this.setState({
-        nickName: loginData.nickName,
-        login: loginData.login
-      })
-    }
   }
   render () {
-    const { nickName, login } = this.state
+    let { nickName, login } = this.props
     return (
       <div className={style['site-nav']}>
         <div className={multStyle(style.inner, 'clearfix')}>
@@ -47,7 +27,7 @@ export default class Index extends Component {
               <p>宝能零售客服电话0755-11111111（工作日8：30-18：00）</p>
             </div>
           </div>
-          <div className={'pull-right'}>
+          <div className={'pull-right'} data-name={nickName}>
             {
               login ? <div className={style.user}>
                 <span>{nickName}</span>
@@ -56,7 +36,7 @@ export default class Index extends Component {
                 >
                   <Button icon='icon-order' className={style['w40']} type='primary' >订单管理</Button>
                 </Link>
-                <Button icon='icon-sign-out' onClick={this.logout} className={style['w40']} type='primary' >退出</Button>
+                <Button icon='icon-sign-out' onClick={this.doClick} className={style['w40']} type='primary' >退出</Button>
               </div> : ''
             }
           </div>
@@ -64,4 +44,9 @@ export default class Index extends Component {
       </div>
     )
   }
+}
+SiteNav.propTypes = {
+  nickName: PropTypes.string,
+  login: PropTypes.bool,
+  onLogout: PropTypes.func
 }

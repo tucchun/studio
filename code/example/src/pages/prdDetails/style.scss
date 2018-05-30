@@ -39,6 +39,9 @@
 					height: 100%;
 				}
 			}
+			.smlImgDiv.cur{
+				border: solid 2px $secondary-color;
+			}
 			.prevArrow{
 				margin-bottom: 10px;
 			}
@@ -151,6 +154,7 @@
 							box-sizing: border-box;
 							line-height: 32px;
 							text-align: center;
+							cursor: pointer;
 						}
 						.prcsCount{
 							width: 64px;

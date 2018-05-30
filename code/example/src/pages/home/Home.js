@@ -6,10 +6,12 @@ import { multStyle } from '../../utils/common'
 import ajax from '../../utils/ajax'
 import style from './style.scss'
 import { connect } from 'react-redux'
+import { fetchClissifyTree } from '../../store/actions'
 export class Home extends Component {
   static propTypes = {
-    context: PropTypes.object,
-    history: PropTypes.object
+    history: PropTypes.object,
+    dispatch: PropTypes.func,
+    classify: PropTypes.any
   }
   constructor (props) {
     super(props)
@@ -18,24 +20,23 @@ export class Home extends Component {
     }
     this.goodsClick = this.goodsClick.bind(this)
     this.doLikeClick = this.doLikeClick.bind(this)
+    this.doClick = this.doClick.bind(this)
   }
   goodsClick (code) {
     this.props.history.push({
-      pathname: `/prdDetails/${code}`
+      pathname: `/pages/prdDetails/${code}`
     })
   }
+  doClick () {
+    this.props.history.push('/pages/prdList')
+  }
   doLikeClick (code) {
-    this.props.context.header.toggleHeaderNumber({
-      ...this.props.context.header.headerNums,
-      collectNums: this.props.context.header.headerNums.collectNums + 1
-    })
     ajax({
       url: '/los/2b-admin-front.addOrCancelFavorite',
       data: {
         productCode: code
       }
     })
-    return false
   }
   componentWillUnmount () {
     this.setState = (state, callback) => {
@@ -44,6 +45,8 @@ export class Home extends Component {
   }
 
   componentDidMount () {
+    const { dispatch } = this.props
+    dispatch(fetchClissifyTree())
     ajax({
       url: '/los/2b-admin-front.productPageList',
       method: 'POST',
@@ -52,7 +55,6 @@ export class Home extends Component {
         pageSize: 10
       }
     }).then(res => {
-      console.log(res)
       if (res && res.list) {
         this.setState({
           goodsList: res.list
@@ -62,18 +64,19 @@ export class Home extends Component {
   }
   render () {
     const goodsList = this.state.goodsList
+    const { classify } = this.props
     return (
       <React.Fragment>
         <div className={style.banner}>
           <div className={style['banner-bg']} />
           <div className={style['banner-content']}>
             {/* 分类导航 */}
-            <div className={style['classify-nav']}>
-              <div className={style.title}>
+            <div className={style['classify-nav']} >
+              <div className={style.title} onClick={this.doClick}>
                 <i className={style['title-icon']} />
                 <h3>全部分类</h3>
               </div>
-              <Item className={style.classify} style={{ display: 'block' }} />
+              <Item className={style.classify} style={{ display: 'block' }} itemList={classify.list} />
             </div>
           </div>
         </div>
@@ -104,7 +107,8 @@ export class Home extends Component {
 }
 const mapStateToProps = state => {
   return {
-    header: state.collects
+    header: state.collects,
+    classify: state.classify
   }
 }
 export default connect(

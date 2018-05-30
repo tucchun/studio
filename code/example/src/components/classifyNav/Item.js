@@ -1,48 +1,36 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { multStyle } from '../../utils/common'
-import ajax from '../../utils/ajax'
 import style from './style.scss'
-
+import PropTypes from 'prop-types'
 export default class Item extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      list: []
-    }
-  }
-  componentDidMount () {
-    ajax({
-      url: '/los/2b-admin-front.queryFrontClassTree'
-    }).then(res => {
-      this.setState({
-        list: res.frontClassifyTree
-      })
-    })
-  }
-  render () {
-    const list = this.state.list
+  render (props) {
+    const { itemList } = this.props
+    let x = 0
     return (
       <ul className={style.main}>
         {
-          list && list.map(e => (
+          itemList && itemList.map(e => (
             <li key={e.classId}>
-              <Link to={{ pathname: '/prdList', hash: '#', search: `?firstClassId=${e.classId}` }}>
-                <p><i className={multStyle(style.ititle, style[`ititle${e.classId}`])} /><span>{e.className}</span></p>
+              {/* <Link to={{ pathname: '/pages/prdList', hash: '#', search: `?firstClassId=${e.classId}` }}> */}
+              <Link to={`/pages/prdList/${e.classId}`}>
+                <p><i className={multStyle(style.ititle, style[`ititle${++x}`])} /><span>{e.className}</span></p>
               </Link>
               {
                 <div className={style['classify-panel']}>
                   {
                     e.subFrontClassifyTree && e.subFrontClassifyTree.map(item => (
                       <dl key={item.classId}>
-                        <Link to={{ pathname: '/prdList', hash: '#', search: `?firstClassId=${e.classId}&secondClassId=${item.classId}` }}>
+                        <Link to={`/pages/prdList/${e.classId}/${item.classId}`}>
+                          {/* <Link to={{ pathname: '/prdList', hash: '#', search: `?firstClassId=${e.classId}&secondClassId=${item.classId}` }}> */}
                           <dt>{item.className}</dt>
                         </Link>
                         {
                           item.subFrontClassifyTree && item.subFrontClassifyTree.map(k => (
-                            <Link
-                              key={k.classId}
-                              to={{ pathname: '/prdList', hash: '#', search: `?firstClassId=${e.classId}&secondClassId=${item.classId}&thirdClassId=${k.classId}` }}>
+                            // <Link
+                            //   key={k.classId}
+                            //   to={{ pathname: '/prdList', hash: '#', search: `?firstClassId=${e.classId}&secondClassId=${item.classId}&thirdClassId=${k.classId}` }}>
+                            <Link key={k.classId} to={`/pages/prdList/${e.classId}/${item.classId}/${k.classId}`}>
                               <dd>{k.className}</dd>
                             </Link>
                           ))
@@ -59,4 +47,7 @@ export default class Item extends Component {
       </ul>
     )
   }
+}
+Item.propTypes = {
+  itemList: PropTypes.array
 }

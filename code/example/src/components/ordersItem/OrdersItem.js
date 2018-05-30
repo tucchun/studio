@@ -5,7 +5,7 @@ import { multStyle } from '../../utils/common'
 import { OrderStatus } from '../../consts/dictionary'
 import style from './style.scss'
 
-export default class OrdersItem extends React.Component {
+export default class OrdersItem extends React.PureComponent {
   constructor (props) {
     super(props)
     this.doClickOrderInfo = this.doClickOrderInfo.bind(this)
@@ -51,7 +51,7 @@ export default class OrdersItem extends React.Component {
           </div>
           <div className={style.operate}>
             <div className={style.label} onClick={this.doClickOrderInfo}>订单详情</div>
-            <div><Button type='m-3'>确认收货</Button></div>
+            {orderStatus === '20' && (<div><Button type='m-3'>确认收货</Button></div>)}
           </div>
         </div>
       </div>

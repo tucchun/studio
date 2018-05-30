@@ -1,35 +1,36 @@
 import React, { Component } from 'react'
 import { Button } from '../../components/form/index'
 import style from './style.scss'
-import Breadcrumb from '../../components/breadcrumb/index'
-import Template from '../template'
 import { multStyle } from '../../utils/common'
+import { updateBreadList } from '../../store/actions'
+import * as OrderResultAction from '../../store/orderResult/actions'
 import { Link } from 'react-router-dom'
-import { withIndexTemplate } from '../template'
 import Text from '../../components/form/Text'
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+
 class OrderResult extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      HeaderNums: {
-        cartNums: 10,
-        collectNums: 10
-      },
-      breadList: [
-        { name: '首页', href: '/' },
-        { name: '清洁用品', href: '/' },
-        { name: '消毒用品', href: '/' },
-        { name: '消毒液', href: '/' }
-      ]
-    }
+    this.state = {}
   }
+  componentDidMount () {
+    const { dispatch, balanceData } = this.props
+    let OrderMsg = balanceData.orderMsg || {}
+    dispatch(updateBreadList([
+      { name: '首页', href: '/' },
+      { name: '订单提交结果', href: './orderResult' }
+    ]))
+    dispatch(OrderResultAction.getOrderMsg(OrderMsg))
+    console.log('componentDidMount')
+  }
+
   render () {
-    let msg = this.props.location.state
-    let success = false
+    let msg = this.props.balanceData.orderMsg
+    let success = msg.orderNo ? true : false
     let cls = 'icon_success'
     let orderInfo = ''
     let ops = ''
-    success = msg.responseCode ? false : true
     cls = success ? cls : 'icon_fail'
     if (success) {
       orderInfo =
@@ -40,8 +41,8 @@ class OrderResult extends Component {
         </div>
       ops =
         <div className={multStyle('clearfix', style.mt80)}>
-          <Button className={'pull-left'}>查看我的订单</Button>
-          <Button className={'pull-right'}>返回首页</Button>
+          <Link to={'/pages/orders'} className={'pull-left'}><Button className={'pull-left'}>查看我的订单</Button></Link>
+          <Link to={'/'}><Button className={'pull-right'}>返回首页</Button></Link>
         </div>
     } else {
       orderInfo =
@@ -50,13 +51,12 @@ class OrderResult extends Component {
         </div>
       ops =
         <div className={multStyle('clearfix', style.mt80)}>
-          <Link to={'/shopcart'} className={'pull-left'}><Button>重新提交</Button></Link>
-          <Link to={'/shopcart'} className={'pull-right'}><Button>返回购物车</Button></Link>
+          <Link to={'/pages/shopcart'} className={'pull-left'}><Button>重新提交</Button></Link>
+          <Link to={'/pages/shopcart'} className={'pull-right'}><Button>返回购物车</Button></Link>
         </div>
     }
     return (
       <div>
-        <Breadcrumb breads={this.state.breadList} />
         <div className={style.orderResult}>
           <div>
             <i className={multStyle(style['icon-biger'], style[cls])}>&nbsp;</i>
@@ -68,4 +68,18 @@ class OrderResult extends Component {
     )
   }
 }
-export default withIndexTemplate(OrderResult)
+
+OrderResult.propTypes = {
+  dispatch:PropTypes.func,
+  balanceData: PropTypes.object
+}
+
+const mapStateToProps = state => {
+  return {
+    orderResultData:state.orderResultData,
+    balanceData:state.balanceData
+  }
+}
+export default connect(
+  mapStateToProps
+)(OrderResult)

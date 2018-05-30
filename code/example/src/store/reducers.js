@@ -1,63 +1,64 @@
-// import { combineReducers } from 'redux'
-import * as OrderReducer from "./order/reducers";
-import { SHOW_LOADING, UPDATE_BREAD_LIST } from "./constants";
+import { SHOW_LOADING, UPDATE_BREAD_LIST, UPDATE_HEADER_NUM, UPDATE_AUTH, UPDATE_CLASSFY_NUM } from './constants'
 
-// 公共数据
-function global(
-  state = {
-    showLoading: false,
-    breadList: [{ name: "首页", href: "/" }],
-    headerNums: {
-      cartNums: 0,
-      collectNums: 0
-    }
-  },
-  action
-) {
+export function updateAuthing (state = {
+  nickName: 'guest',
+  login: false
+}, action) {
   switch (action.type) {
-    case SHOW_LOADING:
-      return {
-        ...state,
-        showLoading: action.show
-      };
-    case UPDATE_BREAD_LIST:
-      return {
-        ...state,
-        breadList: action.breadList
-      };
+    case UPDATE_AUTH:
+      return { ...action.authList }
     default:
-      return state;
+      return state
   }
 }
 
-let arr = ["order"];
-debugger;
-// import('./' + arr[0] + '/reducers.js').then(res => {
-//   console.log(res)
-// }).catch(err => {
-//   console.log(err)
-// })
-Promise.all([import("./" + arr[0] + "/reducers.js")])
-  .then(res => {
-    debugger;
-    console.log(res);
-  })
-  .catch(err => {
-    console.log(err);
-  });
-
-  var cache = {};
-
-  function importAll (r) {
-    r.keys().forEach(key => cache[key] = r(key));
+// loading 状态
+export function loading (state = false, action) {
+  switch (action.type) {
+    case SHOW_LOADING:
+      return action.show
+    default:
+      return state
   }
-  
-  importAll(require.context('./', true, /reducers\.js$/));
-  console.log(cache)
+}
 
-
-
-export default {
-  global,
-  ...OrderReducer
-};
+// 导航 面包屑数据
+export function breadList (state = [
+  { name: '首页', href: '/' }
+], action) {
+  switch (action.type) {
+    case UPDATE_BREAD_LIST:
+      return [
+        ...action.breadList
+      ]
+    default:
+      return state
+  }
+}
+// 分类
+export function classify (state = [], action) {
+  switch (action.type) {
+    case UPDATE_CLASSFY_NUM:
+      return {
+        ...state,
+        ...action.classify
+      }
+    default:
+      return state
+  }
+}
+// 购物车 收藏 数量
+export function headerNums (state = {
+  cartNums: 0,
+  collectNums: 0
+}, action) {
+  switch (action.type) {
+    case UPDATE_HEADER_NUM:
+      return {
+        ...state,
+        ...action.headerNums
+      }
+    default:
+      return state
+  }
+}

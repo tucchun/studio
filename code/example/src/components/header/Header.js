@@ -2,49 +2,28 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { multStyle } from '../../utils/common'
-// import CommonStyle from '../../assets/style/common.scss'
 import { Button, FormSearch } from '../form'
-import ajax from '../../utils/ajax'
 import style from './style.scss'
 import Logo from '../../assets/icon/images/logo.png'
 
-export default class Index extends Component {
+export default class Header extends Component {
   constructor (props) {
     super(props)
     this.state = {
       cartNums: undefined,
-      collectNums: undefined,
       formInput: ''
     }
-    this.onSearch = this.search.bind(this)
+    this.search = this.search.bind(this)
   }
   search (val) {
-    location.href = `/#/prdList?q=${val}`
+    this.props.onSearch(val)
   }
 
   componentDidMount () {
-    ajax({
-      url: '/los/2b-admin-front.getCartNum'
-    }).then(res => {
-      if (res && res.totalProduct) {
-        this.setState({
-          cartNums: res.totalProduct
-        })
-      }
-    })
-    ajax({
-      url: '/los/2b-admin-front.queryCustFavoriteList'
-    }).then(res => {
-      if (res && res.favoriteList) {
-        this.setState({
-          collectNums: res.favoriteList.length
-        })
-      }
-    })
   }
 
   render (props) {
-    const { cartNums, collectNums } = this.state
+    const { cartNums } = this.props
     return (
       <div className={style.header}>
         <div className={style.content}>
@@ -60,18 +39,18 @@ export default class Index extends Component {
               value={this.state.formInput} onSearch={this.search}
             />
             <Link to={{
-              pathname: '/shopcart',
+              pathname: '/pages/shopcart',
               hash: '#'
             }}>
               <Button
                 icon='icon-cart'
                 className={multStyle(style['w40'], style['btncart'])}
-                tip={cartNums} >
+                tip={cartNums || ''} >
                 购物车
               </Button>
             </Link>
             <Link to={{
-              pathname: '/collect',
+              pathname: '/pages/collect',
               // search: '?sort=name',
               hash: '#'
               // state: { fromDashboard: true }
@@ -79,7 +58,7 @@ export default class Index extends Component {
               <Button
                 icon='icon-collect'
                 className={style['w40']}
-                tip={collectNums}>
+              >
                 我的收藏夹
               </Button>
             </Link>
@@ -90,9 +69,7 @@ export default class Index extends Component {
   }
 }
 
-Index.propTypes = {
-  HeaderNums: PropTypes.shape({
-    cartNums: PropTypes.number,
-    collectNums: PropTypes.number
-  })
+Header.propTypes = {
+  cartNums: PropTypes.number,
+  onSearch: PropTypes.func
 }

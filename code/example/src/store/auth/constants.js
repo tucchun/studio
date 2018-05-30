@@ -1,0 +1,6 @@
+export const LOGIN = Symbol('logged in')
+export const LOGIN_SUCCESS = Symbol('logged in success')
+export const LOGIN_FAIL = Symbol('logged in fail')
+export const LOGOUT = Symbol('logged out')
+export const LOGOUT_SUCCESS = Symbol('logged out success')
+export const LOGOUT_FAIL = Symbol('logged out fail')

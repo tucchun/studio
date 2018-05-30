@@ -47,8 +47,7 @@ const config = {
   compiler_vendor : [
     'react',
     'react-dom',
-    'react-router-dom',
-    '../src/assets/style/common.scss'
+    'react-router-dom'
   ]
 }
 

@@ -1,0 +1,40 @@
+@import '../../assets/style/val';
+.confirm{
+  // padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  .confirm-content{
+    flex: 1;
+    padding: 32px;
+    .cc-title{
+      color: $font-primary-color;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 22px;
+      display: block;
+      overflow: auto;
+    }
+    .cc-context{
+      margin-left: 38px;
+      font-size: 14px;
+      color: $font-secondary-color;
+      margin-top: 8px;
+    }
+  }
+  .confirm-header,
+  .confirm-footer{
+    height: 53px;
+  }
+
+  .confirm-footer{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 16px;
+    > button {
+      margin-left: 16px;
+    }
+  }
+}

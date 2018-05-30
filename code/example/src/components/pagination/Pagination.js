@@ -16,7 +16,7 @@ class Pagination extends Component {
       currentPage: props.currentPage,
       totalCount: Number(props.totalCount),
       handleClick: props.handleClick,
-      totalPage: (props.totalCount % pageSize) ? parseInt(props.totalCount / pageSize) + 1 : props.totalCount / pageSize
+      totalPage: Math.ceil(props.totalCount / pageSize)
     }
     this.doPrevClick = this.doPrevClick.bind(this)
     this.doNumClick = this.doNumClick.bind(this)
@@ -24,7 +24,10 @@ class Pagination extends Component {
   }
   static propTypes = {
     currentPage: PropTypes.number,
-    totalCount: PropTypes.string.isRequired,
+    totalCount: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]).isRequired,
     handleClick: PropTypes.func,
     pageSize: PropTypes.number
   }
@@ -32,29 +35,31 @@ class Pagination extends Component {
     currentPage: 1
   }
   doPrevClick (e) {
-    console.log('in doPrev')
     if (this.state.currentPage > 1) {
-      this.setState({ currentPage : this.state.currentPage - 1 })
+      this.setState({ currentPage: this.state.currentPage - 1 })
       this.state.handleClick(e, this.state.currentPage - 1)
     }
   }
   doNextClick (e) {
-    console.log('in doNext')
     if (this.state.currentPage < this.state.totalPage) {
-      this.setState({ currentPage : this.state.currentPage + 1 })
+      this.setState({ currentPage: this.state.currentPage + 1 })
       this.state.handleClick(e, this.state.currentPage + 1)
     }
   }
   doNumClick (e) {
-    this.setState({ currentPage: Number(e.target.text) })
-    this.state.handleClick(e)
+    let el = e.target
+    let pageNo = Number(el.dataset['num'])
+    this.setState({ currentPage: pageNo })
+    this.state.handleClick({
+      pageNo
+    })
   }
   render () {
     // 当前页码
     // 显示分页按钮
     let currentPage = this.state.currentPage
     let pageNum = []
-    let totalPage = this.state.totalPage
+    let totalPage = Math.ceil(this.props.totalCount / this.props.pageSize)
     // 根据返回的总记录数计算当前页显示的数据
     if (totalPage <= 5) {
       for (let i = 1; i <= totalPage; i++) {
@@ -71,7 +76,7 @@ class Pagination extends Component {
         pageNum.push({ num: currentPage - 1, cur: false, key: currentPage - 1 })
         pageNum.push({ num: currentPage, cur: true, key: currentPage })
         pageNum.push({ num: currentPage + 1, cur: false, key: currentPage + 1 })
-        pageNum.push({ num: '...', disable: true, key: '....' })
+        pageNum.push({ num: '...', disable: true, key: '...' })
         pageNum.push({ num: totalPage, cur: false, key: totalPage })
       }
       if (currentPage <= 3) {
@@ -106,7 +111,7 @@ class Pagination extends Component {
             {
               pageNum.map(function (curPageNum) {
                 return (
-                  !curPageNum.disable ? <a onClick={this.doNumClick} key={curPageNum.key} className={curPageNum.cur
+                  !curPageNum.disable ? <a onClick={this.doNumClick} data-num={curPageNum.num} key={curPageNum.key} className={curPageNum.cur
                     ? multStyle(style.num, style.current) : style.num}>{curPageNum.num}</a>
                     : <a className={style.noHover} key={curPageNum.key}>{curPageNum.num}</a>
                 )

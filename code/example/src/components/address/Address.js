@@ -16,7 +16,9 @@ export default class Index extends Component {
 
   componentWillReceiveProps (nextProps) {
     let address = nextProps.address
-    let addressString = address.recipientProvince + address.recipientCity + address.recipientCountry + address.recipientAddress
+    let addressString = address.recipientProvince + '' +
+      address.recipientCity + address.recipientCountry + '' +
+      address.recipientAddress
     this.setState({
       show: nextProps.show,
       address:nextProps.address,
@@ -30,7 +32,7 @@ export default class Index extends Component {
         <div className={style.address}>
           <div className={multStyle(style.address_tag, 'clearfix')}>
             <div className={'pull-left'}>
-              <span>
+              <span className={this.state.address.flag === 'Y' ? '' : style.hidden}>
                 <span className={multStyle(style.icon, style['icon-location'])}>&nbsp;</span>
                 默认地址
               </span>

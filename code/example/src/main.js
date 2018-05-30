@@ -9,9 +9,19 @@ import { HashRouter as Router, Switch } from 'react-router-dom'
 import logger from 'redux-logger'
 import 'normalize.css'
 import './assets/style/common.css'
-import reducers from './store/reducers'
+// import reducers from './store/reducers'
 import routes, { RouteWithSubRoutes } from './router'
 
+var reducers = {}
+function importAll (r) {
+  r.keys().forEach(key => (
+    reducers = {
+      ...reducers,
+      ...r(key)
+    }
+  ))
+}
+importAll(require.context('./store', true, /reducers\.js$/))
 const history = createHashHistory()
 
 // Build the middleware for intercepting and dispatching navigation actions

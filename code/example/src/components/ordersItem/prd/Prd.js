@@ -6,7 +6,7 @@ import { multStyle } from '../../../utils/common'
 // import commonStyle from '../../../assets/style/common.scss'
 import style from './style.scss'
 
-export default class Prd extends React.Component {
+export default class Prd extends React.PureComponent {
   static propTypes = {
     count: PropTypes.number,
     productName: PropTypes.string,
@@ -19,7 +19,7 @@ export default class Prd extends React.Component {
     let btn = null
     if (status === '20') {
       btn = (<Button type='m-3' size='small'>确认收货</Button>)
-    } else if (status === '30' || status === '99') {
+    } else if (status === '30') {
       btn = (
         <React.Fragment>
           <i className={style['icon-verify']} />
