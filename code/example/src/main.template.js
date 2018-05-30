@@ -37,7 +37,6 @@ if (__DEV__ && module.hot) {
 
 async function login () {
   //  初始信息
-  // debugger
   clearCookie()
   let k = genAesKey()
   let initData = await ajax({

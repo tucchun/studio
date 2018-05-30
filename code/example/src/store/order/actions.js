@@ -28,11 +28,9 @@ export const fetchOrderList = (searchData) => (dispatch) => {
     url: '/los/2b-admin-front.getOrderShopList',
     data: searchData
   }).then(res => {
-    debugger
     dispatch(toggleLoading(false)) // 关闭loading
     dispatch(fetchOrderListSuccess(res.orderList))
   }).catch(err => {
-    debugger
     dispatch(toggleLoading(false)) // 关闭loading
     dispatch(fetchOrderListError(err))
   })

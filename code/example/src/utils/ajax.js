@@ -58,7 +58,6 @@ axios.interceptors.response.use(response => {
     //   initialStore.timestamp = parseInt(response.now)
     //   initialStore.localTimestamp = new Date().getTime()
     // }
-    debugger
     if (response.status === 200) {
       const data = response.data || {}
       if (data.responseCode === '000000') {
