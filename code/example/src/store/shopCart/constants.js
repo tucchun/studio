@@ -1,7 +1,0 @@
-export const FETCH_SHOPCART_LIST_FAIL = Symbol('fetch shopcart product list fail')
-export const FETCH_SHOPCART_LIST_SUCCESS = Symbol('fetch shopcart product success')
-export const CLICK_ALLCHECKED = Symbol('all checked status switch')
-export const SWITCH_CHECK_STATUS = Symbol('switch goods check status')
-export const FETCH_DEL_GOODS_SUCCESS = Symbol('delete goods from shopcart success')
-export const FETCH_DEL_GOODS_FAIL = Symbol('delete goods from shopcart fail')
-export const FETCH_SUBMIT_ORDER_SUCCESS = Symbol('order pre submit success')

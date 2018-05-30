@@ -1,1 +1,0 @@
-export const telconst = '4009 338 339'
