@@ -11,38 +11,28 @@ export default class Index extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      goodsItem: this.props.goodsItem
+      goodsItem: this.props.goodsItem,
+      isFavorite: this.props.goodsItem.favorite
     }
     this.getCollection = this.getCollection.bind(this)
   }
 
   getCollection (favorite) {
-    let alink = ''
-    if (parseInt(favorite)) {
-      alink =
-        <a className={style.collected} href='javascript:void(0)' onClick={
-          (e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            this.props.collection && this.props.collection(e)
-          }
-        }>
-          <span className={multStyle(style.icon, style['icon-collection'])}>&nbsp;</span>
-          取消收藏
-        </a>
-    } else {
-      alink =
-        <a href='javascript:void(0)' onClick={
-          (e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            this.props.collection && this.props.collection(e)
-          }
-        }>
-          <span className={multStyle(style.icon, style['icon-collection'])}>&nbsp;</span>
-          收藏
-        </a>
-    }
+    let isFavorite = this.state.isFavorite
+    let alink =
+      <a className={parseInt(isFavorite) === 1 ? style.collected : ''} href='javascript:void(0)' onClick={
+        (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          this.setState({
+            isFavorite: parseInt(isFavorite) === 1 ? 0 : 1
+          })
+          this.props.collection && this.props.collection(e)
+        }
+      }>
+        <span className={multStyle(style.icon, style['icon-collection'])}>&nbsp;</span>
+        {parseInt(isFavorite) === 1 ? '取消收藏' : '收藏'}
+      </a>
     return alink
   }
 
@@ -70,7 +60,6 @@ export default class Index extends Component {
 Index.propTypes = {
   goodsItem: PropTypes.shape({
     titleImage: PropTypes.string,
-    // price:PropTypes.number,
     productName: PropTypes.string,
     isCollectioned: PropTypes.bool
   }),

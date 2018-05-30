@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import style from './style.scss'
 import PropTypes from 'prop-types'
 import { multStyle } from '../../../utils/common'
+import UIImage from '../../../components/Image'
 export default class GoodsInfo extends Component {
   constructor (props) {
     super(props)
@@ -12,7 +13,7 @@ export default class GoodsInfo extends Component {
   render () {
     return (
       <div className={multStyle(style.goods_info, style['pull-left'], style.clearfix)}>
-        <img src={this.state.goodsItem.productImageUrl} alt='商品图片' className={multStyle(style['pull-left'])} />
+        <UIImage size={'70'} src={this.state.goodsItem.productImageUrl} alt='商品图片' className={multStyle(style['pull-left'])} />
         <div className={multStyle(style.introduce, style['pull-left'])}>
           <p>
             {this.state.goodsItem.productName}

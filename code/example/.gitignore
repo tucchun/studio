@@ -3,6 +3,10 @@ node_modules_bak/
 dist/
 npm-debug.log
 .DS_Store
+build_dev_jenkins.sh
+build_fvt_jenkins.sh
+build_uat_jenkins.sh
+build_prd_jenkins.sh
 dist.zip
 *.tar.gz
 yarn.lock

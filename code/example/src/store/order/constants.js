@@ -7,3 +7,5 @@ export const CHANGE_INPUT_DATA = Symbol('change on input date')
 export const FETCH_ORDER_INFO_REQUEST = Symbol('fetch order info')
 export const FETCH_ORDER_INFO_FAILURE = Symbol('fetch order info fail')
 export const FETCH_ORDER_INFO_SUCCESS = Symbol('fetch order info success')
+
+export const PAGE_TURN = Symbol('page turn')

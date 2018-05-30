@@ -4,10 +4,13 @@ import PropTypes from 'prop-types'
 import { multStyle } from '../../utils/common'
 // import PropTypes from 'prop-types'
 import ajax from '../../utils/ajax'
-import Breadcrumb from '../../components/breadcrumb'
 import math from 'mathjs'
+import Img from '../../components/Image'
 import { Button } from '../../components/form'
-import { withTemplate } from '../template'
+import { connect } from 'react-redux'
+import { updateBreadList, updateHeadNums } from '../../store/actions'
+import { fetchPrdDetails, doPrcsCountChangeClick, updateParams, updateCurrentIndex,
+  doScrollArrow, fetchClassifyList } from '../../store/prdDetails/actions'
 export class PrdDetails extends Component {
   constructor (props) {
     super(props)
@@ -22,144 +25,148 @@ export class PrdDetails extends Component {
     this.doAddCartClick = this.doAddCartClick.bind(this)
     this.doAddCollectClick = this.doAddCollectClick.bind(this)
     this.state = {
-      HeaderNums: {
-        cartNums: 10,
-        collectNums: 10
-      },
-      breadList: [
-        { name: '首页', href: '/' },
-        { name: '清洁用品', href: '/#/prdList' },
-        { name: '消毒用品', href: '/#/prdList' },
-        { name: '消毒液', href: '/#/prdList' }
-      ],
-      curImgSrc: '', // 当前大图显示地址
-      topImgIndex: 0, // 顶端图下标
-      botmImgIndex: 5, // 最底端图下标
-      topArrDis: true, // 上箭头是否不可用 默认不可用
-      botmArrDis:false, // 下箭头是否不可用 默认可用
-      smlImgList: [], // 小图列表
-      lagImgList:[], // 详情大图列表
-      prdInfo: {}, // 商品详情信息
-      prcsCount: 1, // 购买数量
-      prdCode: '' // 详情页商品代码
     }
   }
   static propTypes = {
-    context: PropTypes.object,
-    match: PropTypes.object
+    match: PropTypes.object,
+    dispatch: PropTypes.func,
+    prdDetails: PropTypes.object,
+    headerNums: PropTypes.object,
+    classify: PropTypes.object
   }
-
-  componentWillMount () {
-    // let prdCode = location.href.split('')[1]
+  getBrandListByClassId (firstClassId, secondClassId, thirdClassId) {
+    let brandList = []
+    brandList.push({ name: '首页', href: '/' })
+    let classifyList = this.props.classify && this.props.classify.list
+    let firstBrand, secondBrand, thirdBrand
+    if (firstClassId) {
+      firstBrand = classifyList.filter(item => item.classId === firstClassId)[0]
+      brandList.push({name: firstBrand.className, href: `/pages/prdList/${firstBrand.classId}`})
+    }
+    if (secondClassId) {
+      secondBrand = firstBrand.subFrontClassifyTree.filter(item => item.classId === secondClassId)[0]
+      brandList.push({name: secondBrand.className, href: `/pages/prdList/${firstBrand.classId}/${secondBrand.classId}`})
+    }
+    if (thirdClassId) {
+      thirdBrand = secondBrand.subFrontClassifyTree.filter(item => item.classId === thirdClassId)[0]
+      brandList.push({name: thirdBrand.className, href: `/pages/prdList/${firstBrand.classId}/${thirdBrand.classId}`})
+    }
+    return brandList
+  }
+  componentDidMount () {
     let prdCode = this.props.match.params.prdCode
-    this.setState({ prdCode: prdCode })
+    let { dispatch } = this.props
+    let { firstClassId, secondClassId, thirdClassId } = this.props.prdDetails.prdInfo
+    dispatch(fetchPrdDetails({ productCode: prdCode }))
+    dispatch(updateBreadList(this.getBrandListByClassId(
+      firstClassId,
+      secondClassId,
+      thirdClassId
+    )))
+  }
+  doDescClick () { // 减事件
+    let { dispatch } = this.props
+    let { prcsCount } = this.props.prdDetails
+    dispatch(doPrcsCountChangeClick(prcsCount > 1 ? prcsCount - 1 : 1))
+  }
+  doIncreClick () { // 加事件
+    let { dispatch } = this.props
+    let { prcsCount } = this.props.prdDetails
+    dispatch(doPrcsCountChangeClick(prcsCount + 1))
+  }
+  changeHandle () { // 输入事件
+    let { dispatch } = this.props
+    if (Number(this.refs.iptVal.value)) {
+      dispatch(doPrcsCountChangeClick(this.refs.iptVal.value))
+    }
+  }
+  doAddCartClick () { // 添加购物车
+    const { dispatch } = this.props
+    const { cartNums } = this.props.headerNums
+    let prdCode = this.props.match.params.prdCode
     ajax({
-      url: '/los/2b-admin-front.getProductDetails',
+      url: '/los/2b-admin-front.addCar',
+      data: {
+        productCode: prdCode,
+        productNum: this.refs.iptVal.value
+      }
+    }).then(res => {
+      dispatch(updateHeadNums({
+        cartNums: parseInt(cartNums) + parseInt(this.refs.iptVal.value)
+      }))
+    })
+  }
+  doAddCollectClick () { // 添加收藏
+    const { dispatch } = this.props
+    const { collectNums } = this.props.headerNums
+    const { favorite } = this.props.prdDetails
+    let prdCode = this.props.match.params.prdCode
+    ajax({
+      url: '/los/2b-admin-front.addOrCancelFavorite',
       data: {
         productCode: prdCode
       }
     }).then(res => {
-      // 成功回调
-      let lagImgList = []
-      let smlImgList = []
-      let imgList = res.productAttaches
-      lagImgList = imgList.filter(item => item.attachType === '09')
-      lagImgList = (lagImgList) && lagImgList.sort((a, b) => a.attachOrder - b.attachOrder)
-      smlImgList = imgList.filter(item => item.attachType === '01')
-      console.log(smlImgList)
-      console.log(lagImgList)
-      this.setState({
-        prdInfo: res,
-        smlImgList: smlImgList,
-        lagImgList: lagImgList,
-        botmImgIndex: smlImgList.length,
-        curImgSrc: smlImgList[0].url,
-        botmArrDis: smlImgList.length <= 5
-      })
-    })
-  }
-  doDescClick () { // 减事件
-    this.setState({ prcsCount: this.state.prcsCount > 1 ? this.state.prcsCount - 1 : 1 })
-  }
-  doIncreClick () { // 加事件
-    this.setState({ prcsCount: this.state.prcsCount + 1 })
-  }
-  changeHandle () { // 输入事件
-    if (Number(this.refs.iptVal.value)) {
-      this.setState({ prcsCount: Number(this.refs.iptVal.value) })
-    }
-  }
-  doAddCartClick () { // 添加购物车
-    console.log(this.props.context)
-    /* this.props.context.header.toggleHeaderNumber({
-      ...this.props.context.header.headerNums,
-      cartNums: this.props.context.header.headerNums.cartNums + 1
-    }) */
-    console.log(this.props.context)
-    ajax({
-      url: '/los/2b-admin-front.addCar',
-      data: {
-        productCode: this.state.prdCode,
-        productNum: this.refs.iptVal.value
+      let f = favorite === '1' ? '0' : '1'
+      if (f === '1') {
+        dispatch(updateHeadNums({
+          collectNums: parseInt(collectNums) + 1
+        }))
+      } else {
+        dispatch(updateHeadNums({
+          collectNums: parseInt(collectNums) - 1
+        }))
       }
-    })
-  }
-  doAddCollectClick () { // 添加收藏
-    /* this.props.context.header.toggleHeaderNumber({
-      ...this.props.context.header.headerNums,
-      collectNums: this.props.context.header.headerNums.collectNums + 1
-    }) */
-    ajax({
-      url: '/los/2b-admin-front.addOrCancelFavorite',
-      data: {
-        productCode: this.state.prdCode
-      }
+      dispatch(updateParams({
+        favorite: f
+      }))
     })
   }
   mouseEnterHandle (e) { // 鼠标滑入事件
-    this.setState({ curImgSrc: e.target.src })
+    let { dispatch } = this.props
+    dispatch(updateCurrentIndex({ curImgIndex: e.target.id }))
   }
   mouseLeaveHandle () {
 
   }
-  scrollBotmClick () { // 上翻事件
-    if (this.state.topImgIndex < this.state.botmImgIndex - 5) {
-      this.setState({
-        topImgIndex: this.state.topImgIndex + 1,
+  scrollBotmClick () { // 下翻事件
+    let { dispatch } = this.props
+    let { topImgIndex, botmImgIndex } = this.props.prdDetails
+    if (topImgIndex < botmImgIndex - 5) {
+      dispatch(doScrollArrow({
+        topImgIndex: topImgIndex + 1,
         topArrDis: false,
-        botmArrDis: (this.state.topImgIndex + 6 >= this.state.botmImgIndex)
-      })
+        botmArrDis: (topImgIndex + 6 >= botmImgIndex)
+      }))
     }
   }
-  scrollTopClick () { // 下翻事件
-    if (this.state.topImgIndex > 0) {
-      this.setState({
-        topImgIndex: this.state.topImgIndex - 1,
+  scrollTopClick () { // 上翻事件
+    let { dispatch } = this.props
+    let { topImgIndex } = this.props.prdDetails
+    if (topImgIndex > 0) {
+      dispatch(doScrollArrow({
+        topImgIndex: topImgIndex - 1,
         botmArrDis: false,
-        topArrDis: !(this.state.topImgIndex - 1)
-      })
+        topArrDis: !(topImgIndex - 1)
+      }))
     }
   }
   doTotalPrice () { // 总价函数
-    return math.eval(this.state.prcsCount * this.state.prdInfo.price).toFixed(2)
+    let { prcsCount } = this.props.prdDetails
+    let { price } = this.props.prdDetails.prdInfo
+    return math.eval(prcsCount * price).toFixed(2)
   }
   render () {
-    let smlImgList = this.state.smlImgList
-    let lagImgList = this.state.lagImgList
-    let prdInfo = this.state.prdInfo
-    let curImgSrc = this.state.curImgSrc
-    let topImgIndex = this.state.topImgIndex
-    let topArrDis = this.state.topArrDis
-    let botmArrDis = this.state.botmArrDis
-    console.log(prdInfo)
+    let { smlImgList, lagImgList, prdInfo, curImgIndex, topImgIndex,
+      topArrDis, botmArrDis, prcsCount, favorite } = this.props.prdDetails
+    let isFavorite = favorite === '1'
     return (
       <React.Fragment>
-        <Breadcrumb breads={this.state.breadList} />
         <div className={style.prdDetBox}>
           <div className={style.PrdDetails}>
             <div className={style.prdBox}>
               <div className={style.bigImgBox}>
-                <img className={style.bigImg} src={curImgSrc} />
+                <Img className={style.bigImg} src={smlImgList[curImgIndex] && smlImgList[curImgIndex].url} />
               </div>
               <div className={style.smlImgBox}>
                 <div onClick={this.scrollTopClick}
@@ -169,8 +176,9 @@ export class PrdDetails extends Component {
                     smlImgList.map((img, index) => {
                       if (index >= topImgIndex && index < topImgIndex + 5) {
                         return (
-                          <div className={style.smlImgDiv} key={img.attachId}>
-                            <img onMouseEnter={this.mouseEnterHandle}
+                          <div className={parseInt(curImgIndex) === index ? multStyle(style.smlImgDiv, style.cur)
+                            : style.smlImgDiv} key={index}>
+                            <Img onMouseEnter={this.mouseEnterHandle} id={index}
                               onMouseLeave={this.mouseLeaveHandle} src={img.url} className={style.smlImg} />
                           </div>
                         )
@@ -192,12 +200,12 @@ export class PrdDetails extends Component {
                     <span className={style.priceBox}>
                       <span className={style.red}>￥</span>
                       <span className={multStyle(style.red, style.prdInfoPriceNum)}>
-                        {prdInfo.price ? parseFloat(prdInfo.price).toFixed(2) : '无'}</span>
+                        {prdInfo.price ? parseFloat(prdInfo.price).toFixed(2) : ''}</span>
                     </span>
                   </div>
                   <div className={style.Spec}>
                     <span className={style.label}>规格</span>
-                    <span className={style.prdInfoSpec}>{prdInfo.spec}</span>
+                    <span className={style.prdInfoSpec}>{prdInfo.productSpec}</span>
                   </div>
                   <div className={style.prdBrand}>
                     <span className={style.label}>商品品牌</span>
@@ -209,7 +217,7 @@ export class PrdDetails extends Component {
                     <span className={style.label}>采购量</span>
                     <span className={style.handleBox}>
                       <span className={style.desc} onClick={this.doDescClick}>-</span>
-                      <input className={style.prcsCount} value={this.state.prcsCount} ref='iptVal'
+                      <input className={style.prcsCount} value={prcsCount} ref='iptVal'
                         onChange={this.changeHandle} />
                       <span className={style.incre} onClick={this.doIncreClick}>+</span>
                     </span>
@@ -223,8 +231,9 @@ export class PrdDetails extends Component {
                       className={style['add-cart']} type='secondary'
                       onClick={this.doAddCartClick}>加入购物车</Button>
                     <Button disabled={(prdInfo.status !== '1')}
+                      active={isFavorite}
                       className={style['add-collect']} icon='icon-start-collect-1'
-                      onClick={this.doAddCollectClick}>加入收藏夹</Button>
+                      onClick={this.doAddCollectClick}>{ isFavorite ? '取消收藏' : '加入收藏夹' }</Button>
                   </div>
                 </div>
               </div>
@@ -284,8 +293,8 @@ export class PrdDetails extends Component {
               {
                 lagImgList.map(img => {
                   return (
-                    <div className={style.lagImgBox} key={img.url}>
-                      <img src={img.url} className={style.lagImg} />
+                    <div className={style.lagImgBox} key={img.attachId}>
+                      <Img src={img.url} className={style.lagImg} />
                     </div>)
                 })
               }
@@ -296,5 +305,13 @@ export class PrdDetails extends Component {
     )
   }
 }
+const mapStateToProps = state => {
+  return {
+    prdDetails: state.prdDetails,
+    headerNums: state.headerNums
+  }
+}
 
-export default withTemplate(PrdDetails)
+export default connect(
+  mapStateToProps
+)(PrdDetails)

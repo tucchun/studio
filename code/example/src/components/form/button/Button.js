@@ -50,7 +50,7 @@ export default class Button extends Component {
         {this.props.icon ? (<i className={multStyle(style.icon, style[this.props.icon])} />) : null }
         <i role='button-value' className={style['btn-txt']}>{this.props.children}</i>
         {
-          this.props.tip === undefined ? null : (<span className={style.tipWrapp}><i className={style.tip}>{this.props.tip}</i></span>)
+          this.props.tip > 0 ? (<span className={style.tipWrapp}><i className={style.tip}>{this.props.tip}</i></span>) : null
         }
       </button>
     )
@@ -65,6 +65,9 @@ Button.propTypes = {
   className: PropTypes.string,
   size: PropTypes.string,
   type: PropTypes.string,
-  tip: PropTypes.number,
+  tip: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string
+  ]),
   icon: PropTypes.string
 }

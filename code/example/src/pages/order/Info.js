@@ -2,7 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Process, Describe } from '../../components/ordersItem'
 import { GoodsTable } from '../../components/goodsItem'
-import { OrderAction, updateBreadList } from '../../store/actions'
+import { updateBreadList } from '../../store/actions'
+import {
+  fetchOrderInfo
+} from '../../store/order/actions'
 import { connect } from 'react-redux'
 
 export class OrderInfo extends React.Component {
@@ -17,9 +20,10 @@ export class OrderInfo extends React.Component {
     dispatch(updateBreadList([
       { name: '首页', href: '/' },
       { name: '订单管理', href: '/pages/orders' },
-      { name: '订单详情', href: `/pages/ordersinfo/${orderId}` }
+      { name: '订单详情' }
+      // { name: '订单详情', href: `/pages/ordersinfo/${orderId}` }
     ]))
-    dispatch(OrderAction.fetchOrderInfo({ orderNo: orderId }))
+    dispatch(fetchOrderInfo({ orderNo: orderId }))
   }
 
   static propTypes = {
@@ -39,11 +43,20 @@ export class OrderInfo extends React.Component {
     } else {
       step = 3
     }
+    let shopItems = (ordersInfo.orderShopItems || []).map((item) => {
+      return {
+        productPrice: item.unitPrice,
+        productImageUrl: item.url,
+        productName: item.productName,
+        count: item.count,
+        totalPrice: item.totalPrice
+      }
+    })
     return (
       <React.Fragment>
         <Process step={step} />
         <Describe {...ordersInfo} />
-        <GoodsTable goodsList={ordersInfo.orderShopItems} />
+        <GoodsTable goodsList={shopItems} />
       </React.Fragment>
     )
   }

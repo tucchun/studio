@@ -4,7 +4,7 @@ import { OrderStatus } from '../../../consts/dictionary'
 import { Text } from '../../form'
 import style from './style.scss'
 
-export default class Describe extends React.Component {
+export default class Describe extends React.PureComponent {
   static propTypes = {
     orderId: PropTypes.string,
     orderStatus: PropTypes.string,
@@ -101,7 +101,7 @@ export default class Describe extends React.Component {
             </div>
             <div className={style['describe-item']}>
               <label>应付总额:</label>
-              <span className={style.price}>¥<Text type='price'>{amount}</Text></span>
+              <span className={style.price}>&yen;<Text type='price' value={amount}>{amount}</Text></span>
             </div>
           </div>
         </div>

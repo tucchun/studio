@@ -9,41 +9,75 @@ export default class EditorAddress extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      district: {},
+      district:{},
       recipientAddress: '',
       postCode: '',
       recipientName: '',
       recipientPhone: '',
       recipientFxPhone: '',
-      flag: 'Y',
+      flag: '',
       checkState: false,
-      show: false
+      show: false,
+      isUpdate:true
     }
     this.getInputValue = this.getInputValue.bind(this)
+    this.district = this.district.bind(this)
   }
 
   componentWillReceiveProps (nextProps) {
+    let isUpdate = nextProps.isUpdate
+    let checkState = nextProps.address.flag === 'Y' ? true : false
+    let address = {}
+    if (isUpdate === false) {
+      address = {
+        addressId:'',
+        flag:'N',
+        isChecked:true,
+        isChosed:true,
+        isDefault:true,
+        postCode:'',
+        recipientAddress:'',
+        recipientCity:'市辖区',
+        recipientCountry:'东城区',
+        recipientName:'',
+        recipientPhone:'',
+        recipientProvince:'北京'
+      }
+    } else {
+      address = nextProps.address
+    }
     this.setState({
-      show: nextProps.show
+      ...address,
+      show:nextProps.show,
+      checkState,
+      isUpdate
     })
   }
 
-  getInputValue (obj) {
-    let name = obj.name, value = obj.value, objMsg = {}, checkState = !this.state.checkState
-    objMsg[name] = value
-    if (!checkState) objMsg[name] = 'N'
-    if (name === 'flag') {
-      this.setState({
-        ...this.state,
-        ...objMsg,
-        checkState
-      })
-    } else {
-      this.setState({
-        ...this.state,
-        ...objMsg
-      })
+  district () {
+    let recipientProvince = this.state.recipientProvince
+    let recipientCity = this.state.recipientCity
+    let recipientCountry = this.state.recipientCountry
+    return {
+      recipientProvince, recipientCity, recipientCountry
     }
+  }
+
+  getInputValue (obj) {
+    let name = obj.name
+    let value = obj.value
+    let objMsg = {}
+    let checkState = this.state.checkState
+    if (name === 'flag') {
+      checkState = !this.state.checkState
+      objMsg[name] = checkState ? 'Y' : 'N'
+    } else {
+      objMsg[name] = value
+    }
+    this.setState({
+      checkState,
+      ...objMsg
+    })
   }
 
   render () {
@@ -53,14 +87,19 @@ export default class EditorAddress extends Component {
           <div className={style.form}>
             <div className={style.row}>
               <div className={style.label}>所在地区：</div>
-              <div className={style.wrap_input}><Cascade getDistrict={
-                (district) => {
-                  this.setState({
-                    ...this.state,
-                    district
-                  })
-                }
-              }/></div>
+              <div className={style.wrap_input}>
+                <Cascade getDistrict={
+                  (district) => {
+                    console.log(district)
+                    this.setState({
+                      ...this.state,
+                      ...district
+                    })
+                  }
+                } district={
+                  this.district()
+                } />
+              </div>
             </div>
             <div className={style.row}>
               <div className={style.label}>详细地址：</div>
@@ -69,7 +108,7 @@ export default class EditorAddress extends Component {
                   let objVaule = { value: event.target.value, name: event.target.name }
                   this.getInputValue(objVaule)
                 }
-              }/></div>
+              } value={this.state.recipientAddress} /></div>
             </div>
             <div className={style.row}>
               <div className={style.label}>邮政编码：</div>
@@ -103,7 +142,7 @@ export default class EditorAddress extends Component {
                   obj => {
                     this.getInputValue(obj)
                   }
-                }/>
+                } />
               </div>
             </div>
             <div className={style.row}>
@@ -124,12 +163,12 @@ export default class EditorAddress extends Component {
             <div className={style.label}>&nbsp;</div>
             <div className={style.wrap_input}>
               <Button className={style.mr_30} type={'secondary'} size={'normal'}
-                      onClick={
-                        () => {
-                          let district = this.state
-                          this.props.submit(district)
-                        }
-                      }
+                onClick={
+                  () => {
+                    let district = this.state
+                    this.props.submit(district)
+                  }
+                }
               >保存收货信息</Button>
               <Button size={'normal'} onClick={
                 this.props.cancel
@@ -144,5 +183,6 @@ export default class EditorAddress extends Component {
 EditorAddress.propTypes = {
   show: PropTypes.bool.isRequired,
   submit: PropTypes.func.isRequired,
-  cancel: PropTypes.func.isRequired
+  cancel: PropTypes.func.isRequired,
+  isUpdate:PropTypes.bool.isRequired
 }

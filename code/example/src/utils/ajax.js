@@ -1,5 +1,6 @@
 import { md5 } from './security'
 import axios from 'axios'
+import { Confirm } from '../components/modal'
 let API_ROOT = `${location.protocol}//${location.host}`
 if (!__RUN_IN_PRD__) {
   API_ROOT = `${location.protocol}//${location.host}/ec`
@@ -19,15 +20,7 @@ axios.interceptors.request.use(config => {
   const fullUrl = (url.indexOf(API_ROOT) === -1) ? API_ROOT + url : url
   config.url = fullUrl
   data._channel_id = '03'
-  // if (initialStore.timestamp) {
-  //   data.timestamp = initialStore.timestamp + new Date().getTime() - initialStore.localTimestamp
-  // } else {
   data.timestamp = new Date().getTime()
-  // }
-  // data._deviceId = initialStore.openid
-  // if (initialStore.accessToken) {
-  //   data.accessToken = initialStore.accessToken
-  // }
   if (__DEV__) {
     // logger('===============请求接口开始===============\n')
     // logger('请求接口：' + config.url + '\n')
@@ -53,24 +46,26 @@ axios.interceptors.response.use(response => {
       // logger('响应数据：' + JSON.stringify(response) + '\n')
       // logger('===============请求接口结束===============\n')
     }
-  
-    // if (!initialStore.timestamp) {
-    //   initialStore.timestamp = parseInt(response.now)
-    //   initialStore.localTimestamp = new Date().getTime()
-    // }
-    debugger
+
     if (response.status === 200) {
       const data = response.data || {}
       if (data.responseCode === '000000') {
         resolve(data.model)
       } else {
         if (data.responseCode === 'user.invalid') {
-          // location.reload()
-          // setTimeout(() => { HashRouter.replace('/login') }, 1000)
           import('history/createHashHistory').then(createhashHistory => {
-            // createhashHistory.default().replace('/login')
             setTimeout(() => {
-              createhashHistory.default().replace('/login')
+              Confirm({
+                title: '操作提示',
+                context: '请登录',
+                okText: '确认',
+                onOk: function () {
+                  sessionStorage.removeItem('loginData')
+                  const history = createhashHistory.default()
+                  sessionStorage.setItem('from', history.location.pathname)
+                  history.push({ pathname: '/login' })
+                }
+              })
             })
           })
           reject(data.responseCode)
@@ -78,7 +73,6 @@ axios.interceptors.response.use(response => {
         reject(data)
       }
     } else {
-      // error(response.statusText)
       reject(response.statusText)
     }
   })
@@ -87,7 +81,6 @@ axios.interceptors.response.use(response => {
     // logger('响应失败：' + error + '\n')
     // logger('===============请求接口结束===============\n')
   }
-
   return new Error(error)
 })
 
@@ -132,5 +125,3 @@ export default function (url, data = {}, config = {}, options = {}) {
   }
   return axios(args)
 }
-
-// export const API_ROOT1 = API_ROOT

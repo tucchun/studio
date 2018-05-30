@@ -10,7 +10,6 @@ export default class Cascade extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      ...props,
       recipientProvince: '110000',
       recipientProvinceLabel: '',
       recipientCityLabel: '',
@@ -48,6 +47,7 @@ export default class Cascade extends Component {
         break
       case 'recipientCity':
         recipientCity = value.value
+        recipientCountry = ''
         for (let i in cityArr) {
           if (cityArr[i].value === recipientCity) {
             recipientCityLabel = cityArr[i].label
@@ -74,9 +74,59 @@ export default class Cascade extends Component {
       recipientCountry,
       areaArr
     })
+    if (name === 'recipientCountry') {
+      this.props.getDistrict({
+        recipientProvince:recipientProvinceLabel,
+        recipientCity:recipientCityLabel,
+        recipientCountry:recipientCountryLabel
+      })
+    }
     // 获取地址字符串，例如：广东省，深圳市，南山区
-    this.props.getDistrict({
-      recipientProvinceLabel, recipientCityLabel, recipientCountryLabel
+  }
+
+  componentDidMount () {
+    // let district = this.props.district
+    this.setState({
+      ...this.props.district
+    })
+  }
+  componentWillReceiveProps (nextProps) {
+    console.log(nextProps)
+    let district = nextProps.district
+    let recipientProvinceLabel = district.recipientProvince
+    let recipientCityLabel = district.recipientCity
+    let recipientCountryLabel = district.recipientCountry
+    let recipientProvince = ''
+    let recipientCity = ''
+    let recipientCountry = ''
+    let cityArr = []
+    let areaArr = []
+    for (let i in addressData) {
+      if (addressData[i].label === recipientProvinceLabel) {
+        recipientProvince = addressData[i].value
+        cityArr = addressData[i].children
+        for (let j in cityArr) {
+          if (cityArr[j].label === recipientCityLabel) {
+            recipientCity = cityArr[j].value
+            areaArr = cityArr[j].children
+            for (let k in areaArr) {
+              if (areaArr[k].label === recipientCountryLabel) {
+                recipientCountry = areaArr[k].value
+              }
+            }
+          }
+        }
+      }
+    }
+    this.setState({
+      recipientProvince,
+      recipientCity,
+      recipientProvinceLabel,
+      recipientCountryLabel,
+      recipientCityLabel,
+      cityArr,
+      recipientCountry,
+      areaArr
     })
   }
 
@@ -115,5 +165,6 @@ export default class Cascade extends Component {
   }
 }
 Cascade.propTypes = {
-  getDistrict: PropTypes.func.isRequired
+  getDistrict: PropTypes.func.isRequired,
+  district:PropTypes.object
 }

@@ -3,8 +3,15 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Input, Button } from '../../components/form'
 import { OrdersItem, OrderPrd } from '../../components/ordersItem'
+import Pagination from '../../components/pagination'
 import style from './style.scss'
-import { OrderAction, updateBreadList } from '../../store/actions'
+import { updateBreadList } from '../../store/actions'
+import {
+  fetchOrderList,
+  doInputChange,
+  clickOrderStatus,
+  pageTurn
+} from '../../store/order/actions'
 import 'react-datetime/css/react-datetime.css'
 import DateTime from 'react-datetime'
 const moment = require('moment')
@@ -16,32 +23,35 @@ export class OrderList extends React.Component {
     this.doClickOrderInfo = this.doClickOrderInfo.bind(this)
     this.doSearch = this.doSearch.bind(this)
     this.doInputChange = this.doInputChange.bind(this)
-    console.log('constructor')
+    this.doPagination = this.doPagination.bind(this)
   }
 
   componentWillMount () {
-    console.log('componentWillMount')
   }
 
   componentDidMount () {
     const { dispatch, orderLst } = this.props
     dispatch(updateBreadList([
       { name: '首页', href: '/' },
-      { name: '订单管理', href: '/pages/orders' }
+      { name: '订单管理' }
     ]))
-    dispatch(OrderAction.fetchOrderList(orderLst.searchData))
-    console.log('componentDidMount')
+    dispatch(fetchOrderList(orderLst.searchData))
+  }
+
+  doPagination ({pageNo}) { // 分页点击事件
+    let { dispatch } = this.props
+    dispatch(pageTurn(pageNo - 1))
   }
 
   doSearch () {
     let { dispatch, orderLst } = this.props
-    dispatch(OrderAction.fetchOrderList(orderLst.searchData))
+    dispatch(fetchOrderList(orderLst.searchData))
   }
 
   // 输入框 输入事件
   // 绑定数据
   doInputChange (result) {
-    this.props.dispatch(OrderAction.doInputChange(result))
+    this.props.dispatch(doInputChange(result))
   }
 
   doClickOrderInfo (orderId) {
@@ -49,22 +59,30 @@ export class OrderList extends React.Component {
   }
 
   changeStartDate = (result) => {
-    this.props.dispatch(OrderAction.doInputChange({
-      startTime: result.valueOf()
+    this.props.dispatch(doInputChange({
+      name: 'startTime',
+      value: result.valueOf()
     }))
   }
   changeEndDate = (result) => {
     console.log(result)
-    this.props.dispatch(OrderAction.doInputChange({
-      endTime: result.valueOf()
+    this.props.dispatch(doInputChange({
+      name: 'endTime',
+      value: result.valueOf()
     }))
   }
 
-  renderStatusItem = (code, txt, dispatch, searchData) => {
+  renderStatusItem = (code, txt, dispatch) => {
+    const { orderLst } = this.props
+    const searchData = orderLst.searchData
     return (
       <li onClick={() => {
-        dispatch(OrderAction.clickOrderStatus(code))
-        dispatch(OrderAction.fetchOrderList(searchData))
+        let searchData = {
+          ...orderLst.searchData,
+          orderStatus: code
+        }
+        dispatch(clickOrderStatus(code))
+        dispatch(fetchOrderList(searchData))
       }} className={searchData.orderStatus === code ? style.active : ''}>{txt}</li>
     )
   }
@@ -76,11 +94,11 @@ export class OrderList extends React.Component {
       <React.Fragment>
         <div>
           <ul className={style.orderState}>
-            {this.renderStatusItem('', '全部订单', dispatch, searchData)}
-            {this.renderStatusItem('00', '待确认', dispatch, searchData)}
-            {this.renderStatusItem('20', '待收货', dispatch, searchData)}
-            {this.renderStatusItem('30', '已完成', dispatch, searchData)}
-            {this.renderStatusItem('99', '已关闭', dispatch, searchData)}
+            {this.renderStatusItem('', '全部订单', dispatch)}
+            {this.renderStatusItem('00', '待确认', dispatch)}
+            {this.renderStatusItem('20', '待收货', dispatch)}
+            {this.renderStatusItem('30', '已完成', dispatch)}
+            {this.renderStatusItem('99', '已关闭', dispatch)}
           </ul>
         </div>
         <div className={style.condition}>
@@ -119,6 +137,14 @@ export class OrderList extends React.Component {
                 dateFormat={'YYYY-MM-DD'}
                 timeFormat={'HH:mm:ss'}
                 closeOnSelect
+                readOnly
+                viewDate={(() => {
+                  let date = moment()
+                  date.hours(23)
+                  date.minutes(59)
+                  date.seconds(59)
+                  return date
+                })()}
                 inputProps={{
                   className: style.input
                 }}
@@ -152,6 +178,11 @@ export class OrderList extends React.Component {
           <OrderPrd />
         </OrdersItem>
         */}
+        <Pagination
+          currentPage={orderLst.searchData.pageNo + 1}
+          totalCount={Number(orderLst.total)}
+          handleClick={this.doPagination}
+          pageSize={orderLst.searchData.pageSize} />
       </React.Fragment>
     )
   }

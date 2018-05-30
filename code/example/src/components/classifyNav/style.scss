@@ -72,17 +72,18 @@ a{
     margin: 0 24px 0 6px;
     background-image: url(../../assets/icon/images/menu_icon_sprite.png);
     background-repeat: no-repeat;
-  }
-  .ititle1000{
     background-position: -6px -46px;
   }
-  .ititle2000{
+  .ititle1{
+    background-position: -6px -46px;
+  }
+  .ititle2{
     background-position: -6px -86px;
   }
-  .ititle3000{
+  .ititle3{
     background-position: -6px -126px;
   }
-  .ititle4000{
+  .ititle4{
     background-position: -6px -166px;
   }
   li{
@@ -152,16 +153,19 @@ a{
       p {
         color: #fff;
       }
-      .ititle1000{
+      .ititle{
         background-position: -46px -46px;
       }
-      .ititle2000{
+      .ititle1{
+        background-position: -46px -46px;
+      }
+      .ititle2{
         background-position: -46px -86px;
       }
-      .ititle3000{
+      .ititle3{
         background-position: -46px -126px;
       }
-      .ititle4000{
+      .ititle4{
         background-position: -46px -166px;
       }
       .classify-panel{

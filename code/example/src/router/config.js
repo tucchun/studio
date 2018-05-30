@@ -29,10 +29,28 @@ const routes = [
         path: '/pages/collect',
         component: () => import('../pages/collect')
       },
+      // {
+      //   exact: true,
+      //   path: '/pages/prdList',
+      //   component: () => import('../pages/prdList')
+      // },
+      // {
+      //   path: '/pages/prdList/:firstClassId',
+      //   component: () => import('../pages/prdList')
+      // },
+      // {
+      //   path: '/pages/prdList/:firstClassId/:secondClassId',
+      //   component: () => import('../pages/prdList')
+      // },
+      // {
+      //   path: '/pages/prdList',
+      //   component: () => import('../pages/prdList')
+      // },
       {
-        path: '/pages/prdList',
+        path: '/pages/prdList/:firstClassId?/:secondClassId?/:thirdClassId?',
         component: () => import('../pages/prdList')
       },
+
       {
         path: '/pages/prdDetails/:prdCode',
         component: () => import('../pages/prdDetails')

@@ -9,6 +9,13 @@ export default class ChoseAddress extends Component {
       address:props.address
     }
   }
+
+  componentWillReceiveProps (nextProps) {
+    this.setState({
+      address:nextProps.address
+    })
+  }
+
   getDefalutTag (isDefault) {
     if (!isDefault) return null
     return (

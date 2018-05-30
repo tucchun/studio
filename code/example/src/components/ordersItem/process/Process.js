@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import style from './style.scss'
 import { multStyle } from '../../../utils/common'
 
-export default class Process extends React.Component {
+export default class Process extends React.PureComponent {
   static propTypes = {
     step: PropTypes.number
   }
@@ -16,7 +16,7 @@ export default class Process extends React.Component {
     if (step === 1) {
       stepClass = 'process-edit-active'
     } else if (step === 2) {
-      stepClass = 'process-edit-active'
+      stepClass = 'process-verify-active'
     } else if (step === 3) {
       stepClass = 'process-done-active'
     }

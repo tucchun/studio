@@ -1,18 +1,19 @@
 import React, { Component } from 'react'
-import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import ajax from '../../utils/ajax'
 import { multStyle } from '../../utils/common'
 import { clearCookie } from '../../utils/utils'
 import { genAesKey, encPwd, rsaEnctryptASE } from '../../utils/security'
-
+import { connect } from 'react-redux'
+import { authName } from '../../store/actions'
 // import Footer from '../../components/footer'
 import { Input, Button } from '../../components/form'
 import logo from '../../assets/icon/images/logo_white.png'
 import style from './style.scss'
-export default class Login extends Component {
+export class Login extends Component {
   static propTypes = {
-    location: PropTypes.object
+    dispatch: PropTypes.func,
+    history: PropTypes.object
   }
   constructor (props) {
     super(props)
@@ -21,8 +22,7 @@ export default class Login extends Component {
       userpwd: '',
       isRight: true,
       loginNotice: 'fail',
-      loginData: '',
-      redirectToReferrer: false // 是否重定向到之前的页面
+      loginData: ''
     }
     this.login = this.login.bind(this)
   }
@@ -30,6 +30,9 @@ export default class Login extends Component {
     return this.state.username.length > 0 && this.state.userpwd.length > 0
   }
   async login () {
+    const { dispatch } = this.props
+    const pathto = sessionStorage.getItem('from') || '/'
+    if (!(this.state.username.length > 0 && this.state.userpwd.length > 0)) return
     clearCookie()
     let k = genAesKey()
     let initData = await ajax({
@@ -50,7 +53,7 @@ export default class Login extends Component {
     const pwd = this.state.userpwd // 'abcd1234'
     const timeDiff = new Date().getTime() - initData.timeOfGettingWpdTime
     const timeToSend = parseInt(initData.pwdTime) + timeDiff
-    let loginData = await ajax({
+    await ajax({
       url: '/los/2b-admin-front.login',
       data: {
         encFlag: 0,
@@ -58,32 +61,27 @@ export default class Login extends Component {
         loginPwd: encPwd(pwd, timeToSend),
         encKey: rsaEnctryptASE(k)
       }
-    })
-
-    if (!(loginData && loginData.responseCode)) {
-      // success
-      this.setState({
-        redirectToReferrer: true,
-        loginData: loginData
-      })
+    }).then(res => {
+      dispatch(authName({
+        nickName: `${res.custSimpleName}-${res.contact}`,
+        login: true
+      }))
       const loginFrom = {
-        'nickName': `${loginData.custSimpleName}-${loginData.contact}`,
+        'nickName': `${res.custSimpleName}-${res.contact}`,
         'login': true
       }
       sessionStorage.setItem('loginData', JSON.stringify(loginFrom))
-    } else {
+      // localStorage.setItem('loginData', JSON.stringify(loginFrom))
+      this.props.history.push({ pathname: pathto }) // 登陆成功之后重定向到原来的页面
+    }).catch(err => {
       this.setState({
         isRight: false,
-        loginNotice: loginData.responseMsg
+        loginNotice: err.responseMsg
       })
-    }
+    })
   }
   render () {
-    // from 保存跳转到登录页前的页面路径，用于在登陆成功之后重定向到原来的页面
-    const { redirectToReferrer, isRight, username, userpwd, loginData, loginNotice } = this.state
-    const { from } = this.props.location.state || { from: { ...loginData, pathname: '/' } }
-
-    if (redirectToReferrer) return <Redirect to={from} /> // 登录成功 重定向页面
+    const { isRight, username, userpwd, loginNotice } = this.state
     return (
       <div className={style['login-container']}>
         <div className={style['login-bg']} />
@@ -100,7 +98,7 @@ export default class Login extends Component {
             <Input className={multStyle(style.userpwd, isRight ? '' : style['login-err'])} type='password' placeholder='密码' required value={userpwd} onChange={({ value, name }) => {
               this.setState({ 'userpwd': value })
             }} />
-            <Button size='normal' className={style.login} type='primary' onClick={this.login} disabled={!this.validateForm()}>登录</Button>
+            <Button size='normal' className={style.login} type='primary' onClick={this.login} >登录</Button>
           </div>
           <p className={style['login-foot']}>&copy; 2018 宝能零售</p>
         </div>
@@ -108,3 +106,11 @@ export default class Login extends Component {
     )
   }
 }
+const mapStateToProps = state => {
+  return {
+    authList: state.authList
+  }
+}
+export default connect(
+  mapStateToProps
+)(Login)

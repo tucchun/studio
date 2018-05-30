@@ -24,9 +24,6 @@
     "__RUN_IN_ENV__": false
   },
   "rules": {
-    "key-spacing"          : "off",
-    "jsx-quotes"           : [2, "prefer-single"],
-    "max-len"              : [2, 120, 0],
-    "object-curly-spacing" : [2, "always"]
+
   }
 }

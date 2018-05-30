@@ -1,7 +1,10 @@
-// import { combineReducers } from 'redux'
 import {
-  OrdersConst
-} from '../constants'
+  FETCH_ORDER_LIST_SUCCESS,
+  CLICK_ORDER_STATUS,
+  CHANGE_INPUT_DATA,
+  FETCH_ORDER_INFO_SUCCESS,
+  PAGE_TURN
+} from './constants'
 
 // 订单列表
 export function orderLst (state = {
@@ -21,12 +24,13 @@ export function orderLst (state = {
   }
 }, action) {
   switch (action.type) {
-    case OrdersConst.FETCH_ORDER_LIST_SUCCESS:
+    case FETCH_ORDER_LIST_SUCCESS:
       return {
         ...state,
-        girdData: action.result
+        girdData: action.result.orderList,
+        total: action.result.totalCount
       }
-    case OrdersConst.CLICK_ORDER_STATUS:
+    case CLICK_ORDER_STATUS:
       return {
         ...state,
         searchData: {
@@ -34,12 +38,20 @@ export function orderLst (state = {
           orderStatus: action.orderStatus
         }
       }
-    case OrdersConst.CHANGE_INPUT_DATA:
+    case CHANGE_INPUT_DATA:
       return {
         ...state,
         searchData: {
           ...state.searchData,
-          [action.result.name] : action.result.value
+          [action.result.name]: action.result.value
+        }
+      }
+    case PAGE_TURN:
+      return {
+        ...state,
+        searchData: {
+          ...state.searchData,
+          pageNo: action.pageIndex
         }
       }
     default:
@@ -64,7 +76,7 @@ export function ordersInfo (state = {
   orderShopItems: []
 }, action) {
   switch (action.type) {
-    case OrdersConst.FETCH_ORDER_INFO_SUCCESS:
+    case FETCH_ORDER_INFO_SUCCESS:
       return {
         ...state,
         ...action.result.orderShopDetilsDTO

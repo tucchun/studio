@@ -4,12 +4,18 @@ import { multStyle } from '../../utils/common'
 import PropTypes from 'prop-types'
 import { GoodsItem } from '../../components/goodsItem/index'
 import ajax from '../../utils/ajax'
-import Breadcrumb from '../../components/breadcrumb'
 import Pagination from '../../components/pagination'
 import { Button } from '../../components/form'
-import { withTemplate } from '../template'
+import { connect } from 'react-redux'
+import { updateBreadList, updateHeadNums } from '../../store/actions'
+import {
+  updateParams,
+  fetchPrdList,
+  fetchClassifyList
+} from '../../store/prdList/actions'
+// import { PrdListConst } from '../../store/constants'
 
-const PageSize = 5
+const PageSize = 2
 export class PrdList extends Component {
   constructor (props) {
     super(props)
@@ -18,186 +24,182 @@ export class PrdList extends Component {
     this.doDescrClick = this.doDescrClick.bind(this)
     this.toPrdDetails = this.toPrdDetails.bind(this)
     this.doLikeClick = this.doLikeClick.bind(this)
-    this.doClassifyQuery = this.doClassifyQuery.bind(this)
+    this.doClassifyClick = this.doClassifyClick.bind(this)
     this.onPriceClick = this.onPriceClick.bind(this)
     this.state = {
-      isIncreCur: false, // 是否升序
-      isDescrCur: false, // 是否降序
-      HeaderNums: {
-        cartNums: 10,
-        collectNums: 10
-      },
-      breadList: [
-        { name: '首页', href: '/' },
-        { name: '清洁用品', href: '/' },
-        { name: '消毒用品', href: '/' },
-        { name: '消毒液', href: '/' }
-      ],
-      classifyList: [],
-      currentPage:1, // 当前页下标
-      prdList: [], // 商品列表
-      totalCount: 0, // 总商品数
-      productName: '', // 查询商品名称
-      classId: '', // 查询 分类ID
-      firstClassId: '', // 一级分类
-      secondClassId: '', // 二级分类
-      thirdClassId: '' // 三级分类
+      hasDidMount: false
     }
   }
   static propTypes = {
-    context: PropTypes.object,
-    history: PropTypes.object
+    history: PropTypes.object,
+    location: PropTypes.object,
+    match: PropTypes.object,
+    prdData: PropTypes.object,
+    classify: PropTypes.object,
+    dispatch: PropTypes.func,
+    headerNums: PropTypes.object
   }
-  getClassifyList (classId) { // 获取子类分类列表
-    ajax({
-      url: '/los/2b-admin-front.queryFrontClassById',
-      data: {
-        classId: classId || this.state.classId
-      }
-    }).then(res => {
-      console.log('res ', res)
-      if (res) {
-        let classifyList = res.frontClassifies
-        this.setState({
-          classifyList: classifyList
-        })
-      }
-    })
+
+  shouldComponentUpdate (nextProps, nextState) {
+    return true
   }
-  getPrdList (params) { // 获取商品列表函数
-    ajax({
-      url:  '/los/2b-admin-front.productPageList',
-      data:{
-        pageNo: params.currentPage || 0,
-        pageSize: PageSize,
-        firstClassId: params.firstClassId || this.state.firstClassId || undefined,
-        secondClassId: params.secondClassId || this.state.secondClassId || undefined,
-        thirdClassId: params.thirdClassId || this.state.thirdClassId || undefined,
-        productName: params.productName || this.state.productName || undefined,
-        bigPrice: params.bigPrice || undefined,
-        minPrice: params.minPrice || undefined,
-        sortField: params.sortField || undefined,
-        sortType: params.sortType || undefined
-      }
-    }).then(res => {
-      console.log(res)
-      if (res.list) {
-        let prdList = res.list
-        let totalCount = res.totalCount
-        this.setState({
-          prdList: prdList,
-          totalCount: totalCount
-        })
-      } else {
-        this.setState({
-          prdList: [],
-          totalCount: 0
-        })
-      }
-    })
+
+  fetchData = (nextProps) => {
+    let { dispatch } = nextProps
+    let { firstClassId, secondClassId, thirdClassId } = nextProps.match.params
+    let productName = nextProps.location.state && decodeURI(nextProps.location.state.search)
+    let pageNo = productName || firstClassId ? 0 : undefined
+    let searchData = {
+      ...nextProps.prdData.searchData,
+      firstClassId,
+      secondClassId,
+      thirdClassId,
+      productName,
+      pageNo
+    }
+    dispatch(updateParams(searchData))
+    dispatch(fetchPrdList(searchData))
+    secondClassId && dispatch(fetchClassifyList({ classId: secondClassId }))
+    console.log(nextProps.prdData)
+    if (productName) {
+      dispatch(updateBreadList([
+        { name: '全部结果' },
+        { name: '"' + productName + '"' }
+      ]))
+    } else {
+      dispatch(updateBreadList(this.getBrandListByClassId(firstClassId, secondClassId)))
+    }
   }
-  componentWillMount () {
-    let productName = location.href.split('?q=')[1] || ''
-    let firstClassId = !productName && location.href.split('firstClassId=')[1].split('&')[0]
-    let secondClassId = !productName && location.href.split('secondClassId=')[1].split('&')[0]
-    let thirdClassId = location.href.indexOf('thirdClassId=') > 0
-      ? location.href.split('thirdClassId=')[1].split('&')[0] : ''
-    let classId = secondClassId
-    this.getPrdList({
-      firstClassId: firstClassId,
-      secondClassId: secondClassId,
-      thirdClassId: thirdClassId,
-      productName: decodeURI(productName)
-    })
-    this.setState({
-      classId: classId,
-      productName: productName,
-      firstClassId: firstClassId,
-      secondClassId: secondClassId,
-      thirdClassId: thirdClassId
-    })
-    this.getClassifyList(classId)
-    console.log('classId', classId)
+
+  componentDidMount () {
+    this.fetchData(this.props)
+    this.setState({ hasDidMount: !this.state.hasDidMount })
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.location !== this.props.location) {
+      this.fetchData(nextProps)
+    }
+  }
+  getBrandListByClassId (firstClassId, secondClassId) {
+    let brandList = []
+    brandList.push({ name: '首页', href: '/' })
+    let classifyList = this.props.classify && this.props.classify.list
+    let firstBrand, secondBrand
+    console.log('classifyList: ', classifyList)
+    if (firstClassId) {
+      firstBrand = classifyList.filter(item => item.classId === firstClassId)[0]
+      brandList.push({name: firstBrand.className, href: `/pages/prdList/${firstBrand.classId}`})
+    }
+    if (secondClassId) {
+      secondBrand = firstBrand.subFrontClassifyTree.filter(item => item.classId === secondClassId)[0]
+      brandList.push({name: secondBrand.className, href: `/pages/prdList/${firstBrand.classId}/${secondBrand.classId}`})
+    }
+    return brandList
   }
   onPriceClick () {
+    let { dispatch } = this.props
     let minPrice = this.refs.minPrice.value
     let bigPrice = this.refs.bigPrice.value
-    this.getPrdList({
+    let searchData = {
+      ...this.props.prdData.searchData,
       sortField: 'price',
       minPrice: minPrice,
       bigPrice: bigPrice
-    })
+    }
+    dispatch(updateParams(searchData))
+    dispatch(fetchPrdList(searchData))
   }
-  doClassifyQuery (classId) { // 子分类点击事件
-    this.getPrdList({
-      thirdClassId: classId
+  doClassifyClick (classId) { // 子分类点击事件
+    let { dispatch } = this.props
+    let { firstClassId, secondClassId } = this.props.prdData.searchData
+    this.props.history.push({
+      pathname: `/pages/prdList/${firstClassId}/${secondClassId}/${classId}`
     })
+    let searchData = {
+      ...this.props.prdData.searchData,
+      thirdClassId: classId
+    }
+    dispatch(fetchPrdList(searchData))
+    dispatch(updateParams(searchData))
   }
   onPagClick (e, index) { // 分页点击事件
-    console.log(e.target.text)
+    let { dispatch } = this.props
     let curPage = Number(e.target.text) ? Number(e.target.text) - 1 : index - 1
-    this.getPrdList({
-      currentPage: curPage
-    })
+    let searchData = {
+      ...this.props.prdData.searchData,
+      pageNo: curPage
+    }
+    dispatch(fetchPrdList(searchData))
+    dispatch(updateParams(searchData))
   }
   doIncreClick () { // 升序事件
-    this.setState({
-      isIncreCur: !this.state.isIncreCur,
-      isDescrCur: false
-    })
-    this.getPrdList({
-      sortField: 'max_price',
+    let { dispatch } = this.props
+    let searchData = {
+      ...this.props.prdData.searchData,
+      sortField: 'price',
       sortType: 'ASC'
-    })
+    }
+    dispatch(updateParams(searchData))
+    dispatch(fetchPrdList(searchData))
   }
   doDescrClick () { // 降序事件
-    this.setState({
-      isDescrCur: !this.state.isDescrCur,
-      isIncreCur: false
-    })
-    this.getPrdList({
-      sortField: 'max_price',
+    let { dispatch } = this.props
+    let searchData = {
+      ...this.props.prdData.searchData,
+      sortField: 'price',
       sortType: 'DESC'
-    })
+    }
+    dispatch(updateParams(searchData))
+    dispatch(fetchPrdList(searchData))
   }
   toPrdDetails (prdCode) { // 商品点击事件
-    console.log(prdCode)
     this.props.history.push({
-      pathname: `/prdDetails/${prdCode}`
+      pathname: `/pages/prdDetails/${prdCode}`
     })
   }
-  doLikeClick (prdCode) { // 收藏事件
-    console.log(this.props.context.header)
-    /* this.props.context.header.toggleHeaderNumber({
-      ...this.props.context.header.headerNums,
-      collectNums: this.props.context.header.headerNums.collectNums + 1
-    }) */
+  doLikeClick (prdCode, favorite) { // 收藏事件
+    let { dispatch } = this.props
+    let { collectNums } = this.props.headerNums
+    let { searchData } = this.props.prdData
     ajax({
       url: '/los/2b-admin-front.addOrCancelFavorite',
       data: {
         productCode: prdCode
       }
+    }).then(res => {
+      let f = favorite === '1' ? '0' : '1'
+      if (f === '1') {
+        dispatch(updateHeadNums({
+          collectNums: parseInt(collectNums) + 1
+        }))
+      } else {
+        dispatch(updateHeadNums({
+          collectNums: parseInt(collectNums) - 1
+        }))
+      }
+      dispatch(fetchPrdList(searchData))
     })
     return false
   }
   render () {
-    let prdList = this.state.prdList
-    let prdTotal = this.state.totalCount
+    let prdList = this.props.prdData.prdList
+    let prdTotal = this.props.prdData.totalCount
+    let { secondClassId } = this.props.match.params
     return (
       <div>
-        <Breadcrumb breads={this.state.breadList} />
         <div className={style.contentBox}>
           <div className={style.filterBox}>
             {
-              !this.state.productName && <div className={style.classifyBox}>
+              !this.props.prdData.productName && this.props.prdData.classifyList && secondClassId && <div className={style.classifyBox}>
                 <span className={style.filterLabel}>
                 分类：
                 </span>
                 <ul className={style.classifyUl}>
                   {
-                    this.state.classifyList.map(classify => {
+                    this.props.prdData.classifyList.map(classify => {
                       return <li key={classify.classId}
-                        onClick={() => this.doClassifyQuery(classify.classId)}>{ classify.className }</li>
+                        onClick={() => this.doClassifyClick(classify.classId)}>{ classify.className }</li>
                     })
                   }
                 </ul>
@@ -215,9 +217,11 @@ export class PrdList extends Component {
                   <span className={style.priceLabel}>价格</span>
                   <span className={style.priceMark}>
                     <i onClick={this.doIncreClick}
-                      className={this.state.isIncreCur ? multStyle(style.cur, style.incre) : style.incre} />
+                      className={this.props.prdData.searchData.sortType === 'ASC'
+                        ? multStyle(style.cur, style.incre) : style.incre} />
                     <i onClick={this.doDescrClick}
-                      className={this.state.isDescrCur ? multStyle(style.cur, style.descr) : style.descr} />
+                      className={this.props.prdData.searchData.sortType === 'DESC'
+                        ? multStyle(style.cur, style.descr) : style.descr} />
                   </span>
                 </span>
                 <span className={style.inputBox}>
@@ -239,18 +243,29 @@ export class PrdList extends Component {
                   return (
                     <GoodsItem goodsItem={goodsItem} key={goodsItem.productCode}
                       onClick={() => this.toPrdDetails(goodsItem.productCode)}
-                      collection={() => this.doLikeClick(goodsItem.productCode)} />
+                      collection={() => this.doLikeClick(goodsItem.productCode, goodsItem.favorite)} />
                   )
                 })
               }
             </div>
           </div>
-          { this.state.totalCount > PageSize &&
-            <Pagination totalCount={this.state.totalCount} handleClick={this.onPagClick} pageSize={PageSize} /> }
+          {
+            prdTotal > PageSize &&
+            <Pagination totalCount={prdTotal} handleClick={this.onPagClick} pageSize={PageSize} /> }
         </div>
       </div>
     )
   }
 }
 
-export default withTemplate(PrdList)
+const mapStateToProps = state => {
+  return {
+    prdData: state.prdData,
+    classify: state.classify,
+    headerNums: state.headerNums
+  }
+}
+
+export default connect(
+  mapStateToProps
+)(PrdList)
